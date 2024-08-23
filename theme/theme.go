@@ -190,7 +190,7 @@ func (t *Theme) dark() *Theme {
 	t.Size.Medium = ElementSize{TextSize: unit.Sp(14), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(24)}
 	t.Size.Large = ElementSize{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
 
-	t.Size.DefaultElementWidth = unit.Dp(350)
+	t.Size.DefaultElementWidth = unit.Dp(500)
 	t.Size.DefaultTextSize = unit.Sp(14)
 	t.Size.DropdownTextSize = unit.Sp(13)
 	t.Size.DefaultIconSize = unit.Dp(20)
