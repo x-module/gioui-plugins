@@ -25,7 +25,7 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.DefaultButton(th, &clickable, "default", unit.Dp(100)).Layout(gtx)
+								return widgets.DefaultButton(th, &clickable, "你好", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {

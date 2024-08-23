@@ -20,6 +20,14 @@ import (
 	"image"
 )
 
+type Action int
+
+const (
+	BothAction Action = iota
+	OnlyCancelAction
+	OnlyConfirmAction
+)
+
 type Confirm struct {
 	theme            *theme.Theme
 	title            string
@@ -30,8 +38,10 @@ type Confirm struct {
 	cancelClickable  widget.Clickable
 	confirmClickable widget.Clickable
 	clickerWidget    *Clickable
+	action           Action
 	cancelFunc       func()
 	confirmFunc      func()
+	customAction     []layout.FlexChild
 }
 
 func NewConfirm(th *theme.Theme) *Confirm {
@@ -41,29 +51,43 @@ func NewConfirm(th *theme.Theme) *Confirm {
 		width:         300,
 		title:         "操作确认",
 		clickerWidget: NewClickable(th),
+		action:        BothAction,
 	}
 	return modal
 }
-
-func (c *Confirm) Confirm(fun func()) {
+func (c *Confirm) SetAction(action Action) *Confirm {
+	c.action = action
+	return c
+}
+func (c *Confirm) Confirm(fun func()) *Confirm {
 	c.confirmFunc = fun
+	return c
 }
-func (c *Confirm) Cancel(fun func()) {
+func (c *Confirm) Cancel(fun func()) *Confirm {
 	c.cancelFunc = fun
+	return c
 }
 
-func (c *Confirm) SetWidth(width int) {
+func (c *Confirm) SetWidth(width int) *Confirm {
 	c.width = width
+	return c
 }
 func (c *Confirm) Visible() bool {
 	return c.visible
 }
-func (c *Confirm) SetTitle(title string) {
+func (c *Confirm) SetTitle(title string) *Confirm {
 	c.title = title
+	return c
 }
 
-func (c *Confirm) SetHeight(height int) {
+func (c *Confirm) SetCustomAction(customAction []layout.FlexChild) *Confirm {
+	c.customAction = customAction
+	return c
+}
+
+func (c *Confirm) SetHeight(height int) *Confirm {
 	c.height = height
+	return c
 }
 
 func (c *Confirm) Message(message string) {
@@ -96,6 +120,51 @@ func (c *Confirm) Layout(gtx layout.Context) layout.Dimensions {
 	}
 	width := gtx.Dp(unit.Dp(c.width))
 	height := gtx.Dp(unit.Dp(c.height))
+
+	var actions []layout.FlexChild
+
+	if c.customAction != nil {
+		actions = c.customAction
+	} else {
+		cancelAction := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			but := DefaultButton(c.theme, &c.cancelClickable, "取消", unit.Dp(70), layout.Inset{
+				Top: 3, Bottom: 3,
+				Left: 5, Right: 5,
+			})
+			return but.Layout(gtx)
+		})
+
+		confirmAction := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			but := SuccessButton(c.theme, &c.confirmClickable, "确认", unit.Dp(70), layout.Inset{
+				Top: 3, Bottom: 3,
+				Left: 5, Right: 5,
+			})
+			return but.Layout(gtx)
+		})
+
+		space := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Dimensions{Size: image.Point{X: 20, Y: 0}}
+		})
+
+		if c.action == BothAction {
+			actions = []layout.FlexChild{
+				cancelAction,
+				space,
+				confirmAction,
+			}
+
+		}
+		if c.action == OnlyCancelAction {
+			actions = []layout.FlexChild{
+				cancelAction,
+			}
+		} else if c.action == OnlyConfirmAction {
+			actions = []layout.FlexChild{
+				confirmAction,
+			}
+		}
+	}
+
 	return c.clickerWidget.SetWidget(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{
 			Top: unit.Dp(10),
@@ -142,28 +211,9 @@ func (c *Confirm) Layout(gtx layout.Context) layout.Dimensions {
 					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
 						return layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 							return layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										but := DefaultButton(c.theme, &c.cancelClickable, "取消", unit.Dp(70), layout.Inset{
-											Top: 3, Bottom: 3,
-											Left: 5, Right: 5,
-										})
-										return but.Layout(gtx)
-									}),
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										return layout.Dimensions{Size: image.Point{X: 20, Y: 0}}
-									}),
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										but := SuccessButton(c.theme, &c.confirmClickable, "确认", unit.Dp(70), layout.Inset{
-											Top: 3, Bottom: 3,
-											Left: 5, Right: 5,
-										})
-										return but.Layout(gtx)
-									}),
-								)
+								return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, actions...)
 							})
 						})
-
 					}),
 				)
 			})

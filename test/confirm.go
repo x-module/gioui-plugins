@@ -16,12 +16,24 @@ func main() {
 	var clickable widget.Clickable
 	var th = theme.NewTheme()
 	confirm := widgets.NewConfirm(th)
+	// confirm.SetAction(widgets.OnlyConfirmAction)
+	// confirm.SetAction(widgets.OnlyCancelAction)
 	confirm.Confirm(func() {
 		fmt.Println("确定...")
 	})
 	confirm.Cancel(func() {
 		fmt.Println("取消...")
 	})
+
+	// 自定义按钮
+	// confirm.SetCustomAction([]layout.FlexChild{
+	// 	layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+	// 		return widgets.DefaultButton(th, &clickable, "确定", unit.Dp(100)).Layout(gtx)
+	// 	}),
+	// 	layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+	// 		return widgets.DefaultButton(th, &clickable, "确定33", unit.Dp(100)).Layout(gtx)
+	// 	}),
+	// })
 
 	win := window.NewInitialize()
 	win.Title("Hello, Gio!").Size(800, 600)
