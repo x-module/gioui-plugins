@@ -4,6 +4,7 @@ go 1.22.5
 
 require (
 	gioui.org v0.7.1
+	gioui.org/x v0.7.1
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	golang.org/x/exp/shiny v0.0.0-20240808152545-0cdaa3abc0fa
 )

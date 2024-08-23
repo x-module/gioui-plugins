@@ -6,6 +6,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"github.com/gen2brain/dlgs"
+	"github.com/gioui-plugins/resource"
 	"github.com/gioui-plugins/theme"
 )
 
@@ -20,11 +21,11 @@ type DirSelector struct {
 	width       unit.Dp
 }
 
-func NewDirSelector(theme *theme.Theme, hint string, dirName ...string) *DirSelector {
+func NewDirSelector(th *theme.Theme, hint string, dirName ...string) *DirSelector {
 	bf := &DirSelector{
-		theme:       theme,
-		input:       NewInput(theme, hint, dirName...),
-		width:       unit.Dp(200),
+		theme:       th,
+		input:       NewInput(th, hint, dirName...),
+		width:       th.Size.DefaultElementWidth,
 		windowTitle: "Select Directory",
 	}
 	if len(dirName) > 0 {
@@ -36,13 +37,15 @@ func NewDirSelector(theme *theme.Theme, hint string, dirName ...string) *DirSele
 }
 
 // SetWidth 设置width
-func (b *DirSelector) SetWidth(width unit.Dp) {
+func (b *DirSelector) SetWidth(width unit.Dp) *DirSelector {
 	b.width = width
+	return b
 }
 
 // SetWindowTitle 设置windowTitle
-func (b *DirSelector) SetWindowTitle(title string) {
+func (b *DirSelector) SetWindowTitle(title string) *DirSelector {
 	b.windowTitle = title
+	return b
 }
 
 func (b *DirSelector) action(gtx layout.Context) {
@@ -69,15 +72,17 @@ func (b *DirSelector) action(gtx layout.Context) {
 		}
 	}
 }
-func (b *DirSelector) SetOnSelectDir(f func(dir string)) {
+func (b *DirSelector) SetOnSelectDir(f func(dir string)) *DirSelector {
 	b.onSelectDir = f
+	return b
 }
 
-func (b *DirSelector) setDirName(name string) {
+func (b *DirSelector) setDirName(name string) *DirSelector {
 	b.dirName = name
 	b.input.SetText(name)
 	b.updateIcon()
 	b.changed = true
+	return b
 }
 
 func (b *DirSelector) Changed() bool {
@@ -101,15 +106,15 @@ func (b *DirSelector) updateIcon() {
 	if b.dirName != "" {
 		b.input.SetAfter(func(gtx layout.Context) layout.Dimensions {
 			return b.actionClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				gtx.Constraints.Max.X = gtx.Dp(resource.DefaultIconSize)
-				return DeleteIcon.Layout(gtx, resource.IconGrayColor)
+				gtx.Constraints.Max.X = gtx.Dp(b.theme.Size.DefaultIconSize)
+				return resource.DeleteIcon.Layout(gtx, b.theme.Color.IconGrayColor)
 			})
 		})
 	} else {
 		b.input.SetAfter(func(gtx layout.Context) layout.Dimensions {
 			return b.actionClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				gtx.Constraints.Max.X = gtx.Dp(resource.DefaultIconSize)
-				return UploadIcon.Layout(gtx, resource.IconGrayColor)
+				gtx.Constraints.Max.X = gtx.Dp(b.theme.Size.DefaultIconSize)
+				return resource.UploadIcon.Layout(gtx, b.theme.Color.IconGrayColor)
 			})
 		})
 	}

@@ -12,7 +12,7 @@ import (
 
 func main() {
 	var clickable widget.Clickable
-	var th = theme.NewTheme()
+	th := theme.NewTheme()
 	win := window.NewInitialize()
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
