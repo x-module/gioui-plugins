@@ -1,68 +1,51 @@
-/**
- * Created by Goland
- * @file   ccc.go
- * @author 李锦 <lijin@cavemanstudio.net>
- * @date   2024/8/23 14:42
- * @desc   ccc.go
- */
-
 package main
 
-import "image/color"
-
-type aaa struct {
-	DefaultWindowBgGrayColor  color.NRGBA
-	DefaultContentBgGrayColor color.NRGBA
-	DefaultBgGrayColor        color.NRGBA
-	DefaultTextWhiteColor     color.NRGBA
-	DefaultBorderGrayColor    color.NRGBA
-	DefaultBorderBlueColor    color.NRGBA
-
-	DefaultLineColor   color.NRGBA
-	DefaultMaskBgColor color.NRGBA
-
-	IconGrayColor            color.NRGBA
-	BorderBlueColor          color.NRGBA
-	BorderLightGrayColor     color.NRGBA
-	HoveredBorderBlueColor   color.NRGBA
-	FocusedBorderBlueColor   color.NRGBA
-	ActivatedBorderBlueColor color.NRGBA
-	FocusedBgColor           color.NRGBA
-	TextSelectionColor       color.NRGBA
-	HintTextColor            color.NRGBA
-
-	DropDownBgGrayColor          color.NRGBA
-	DropDownItemHoveredGrayColor color.NRGBA
-
-	GreenColor   color.NRGBA
-	ErrorColor   color.NRGBA
-	WarningColor color.NRGBA
-	SuccessColor color.NRGBA
-	InfoColor    color.NRGBA
-
-	ActionTipsBgGrayColor color.NRGBA
-	ProgressBarColor      color.NRGBA
-
-	MenuHoveredBgColor  color.NRGBA
-	MenuSelectedBgColor color.NRGBA
-	LogTextWhiteColor   color.NRGBA
-
-	NotificationBgColor        color.NRGBA
-	NotificationTextWhiteColor color.NRGBA
-	ModalBgGrayColor           color.NRGBA
-
-	DropdownMenuBgColor color.NRGBA
-	DropdownTextColor   color.NRGBA
-
-	NoticeInfoColor    color.NRGBA
-	NoticeSuccessColor color.NRGBA
-	NoticeWaringColor  color.NRGBA
-	NoticeErrorColor   color.NRGBA
-
-	JsonStartEndColor color.NRGBA
-	JsonKeyColor      color.NRGBA
-	JsonStringColor   color.NRGBA
-	JsonNumberColor   color.NRGBA
-	JsonBoolColor     color.NRGBA
-	JsonNullColor     color.NRGBA
-}
+//
+// func main() {
+// 	var clickable widget.Clickable
+// 	var overlay widget.Clickable // This will be our overlay to block clicks.
+// 	var th = material.NewTheme()
+// 	// w := new(app.Window)
+// 	var ops op.Ops
+// 	go func() {
+// 		w := new(app.Window)
+// 		for {
+// 			e := w.Event()
+// 			switch e := e.(type) {
+// 			case app.DestroyEvent:
+// 				panic(e.Err)
+// 			case app.FrameEvent:
+// 				gtx := app.NewContext(&ops, e)
+// 				// ==============================================
+// 				layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+// 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+// 						if clickable.Clicked(gtx) {
+// 							log.Println("Button clicked!")
+// 						}
+// 						return material.Button(th, &clickable, "Click Me").Layout(gtx)
+// 					}),
+// 				)
+//
+// 				// Conditionally layout an overlay that blocks interaction with underlying components.
+// 				if true { // Set to true to enable the overlay, false to disable it.
+// 					layOverlay(gtx, &overlay)
+// 				}
+//
+// 				e.Frame(gtx.Ops)
+// 			}
+// 		}
+// 	}()
+// 	app.Main()
+// }
+//
+// func layOverlay(gtx layout.Context, overlay *widget.Clickable) {
+// 	// Fill the whole area with a semi-transparent overlay.
+// 	dr := image.Rectangle{Max: gtx.Constraints.Max}
+// 	paint.FillShape(gtx.Ops, color.NRGBA{R: 0, G: 0, B: 0, A: 128}, clip.Rect(dr).Op())
+//
+// 	// Create an invisible clickable widget that covers the entire area.
+// 	overlay.Layout(gtx)
+// 	if overlay.Clicked(gtx) {
+// 		log.Println("Overlay clicked, blocking underlying clicks.")
+// 	}
+// }

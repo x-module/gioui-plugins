@@ -15,7 +15,7 @@ import (
 	"image/color"
 )
 
-type size struct {
+type ElementSize struct {
 	TextSize unit.Sp
 	Height   unit.Dp
 	Inset    layout.Inset
@@ -23,10 +23,10 @@ type size struct {
 }
 
 type Size struct {
-	Tiny   size
-	Small  size
-	Medium size
-	Large  size
+	Tiny   ElementSize
+	Small  ElementSize
+	Medium ElementSize
+	Large  ElementSize
 
 	DefaultElementWidth      unit.Dp
 	DefaultTextSize          unit.Sp
@@ -185,10 +185,10 @@ func (t *Theme) dark() *Theme {
 	t.Color.JsonBoolColor = color.NRGBA{R: 161, G: 112, B: 88, A: 255}
 	t.Color.JsonNullColor = color.NRGBA{R: 170, G: 118, B: 93, A: 255}
 
-	t.Size.Tiny = size{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
-	t.Size.Small = size{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
-	t.Size.Medium = size{TextSize: unit.Sp(14), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(24)}
-	t.Size.Large = size{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
+	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
+	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
+	t.Size.Medium = ElementSize{TextSize: unit.Sp(14), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(24)}
+	t.Size.Large = ElementSize{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
 
 	t.Size.DefaultElementWidth = unit.Dp(350)
 	t.Size.DefaultTextSize = unit.Sp(14)
