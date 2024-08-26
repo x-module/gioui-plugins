@@ -1,7 +1,7 @@
 package widgets
 
 import (
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 	"image/color"
 
 	"gioui.org/io/semantic"

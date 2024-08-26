@@ -3,7 +3,7 @@ package widgets
 import (
 	"gioui.org/layout"
 	"gioui.org/unit"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 )
 
 type LabeledInput struct {

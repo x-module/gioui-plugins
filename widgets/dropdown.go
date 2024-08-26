@@ -3,8 +3,8 @@ package widgets
 import (
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
-	"github.com/gioui-plugins/resource"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/resource"
+	"github.com/x-module/gioui-plugins/theme"
 	"image"
 	"image/color"
 

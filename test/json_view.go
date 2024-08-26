@@ -6,10 +6,10 @@ import (
 	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
-	"github.com/gioui-plugins/resource"
-	"github.com/gioui-plugins/theme"
-	"github.com/gioui-plugins/widgets"
-	"github.com/gioui-plugins/window"
+	"github.com/x-module/gioui-plugins/resource"
+	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/widgets"
+	"github.com/x-module/gioui-plugins/window"
 )
 
 // resource.DeleteIcon

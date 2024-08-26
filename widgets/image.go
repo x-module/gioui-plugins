@@ -14,7 +14,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op/paint"
 	"gioui.org/widget"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 	"image"
 	"image/jpeg"
 	"image/png"

@@ -5,7 +5,7 @@ package widgets
 import (
 	"gioui.org/font"
 	"gioui.org/widget/material"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 )
 
 func H1(th *theme.Theme, txt string) material.LabelStyle {

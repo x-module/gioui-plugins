@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"fmt"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 	"strings"
 
 	"gioui.org/font"

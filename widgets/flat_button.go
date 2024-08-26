@@ -5,8 +5,8 @@ import (
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/widget/material"
-	"github.com/gioui-plugins/theme"
-	"github.com/gioui-plugins/utils"
+	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/utils"
 	"image"
 	"image/color"
 

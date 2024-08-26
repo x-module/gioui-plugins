@@ -6,8 +6,8 @@ import (
 	"gioui.org/op"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"github.com/gioui-plugins/theme"
-	"github.com/gioui-plugins/window"
+	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/window"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/gioui-plugins
+module github.com/x-module/gioui-plugins
 
 go 1.22.5
 

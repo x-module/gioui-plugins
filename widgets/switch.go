@@ -12,7 +12,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 )
 
 type Switch struct {

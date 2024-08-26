@@ -17,7 +17,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/x/component"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/theme"
 	"image/color"
 )
 

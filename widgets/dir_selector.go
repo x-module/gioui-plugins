@@ -6,8 +6,8 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"github.com/gen2brain/dlgs"
-	"github.com/gioui-plugins/resource"
-	"github.com/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/resource"
+	"github.com/x-module/gioui-plugins/theme"
 )
 
 type DirSelector struct {
