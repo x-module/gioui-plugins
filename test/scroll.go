@@ -1,11 +1,3 @@
-/**
- * Created by Goland
- * @file   aaa.go
- * @author 李锦 <lijin@cavemanstudio.net>
- * @date   2024/7/23 17:35
- * @desc   aaa.go
- */
-
 package main
 
 import (
@@ -14,9 +6,11 @@ import (
 	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
-	"gioui.org/widget/material"
+	"github.com/gioui-plugins/resource"
+	"github.com/gioui-plugins/theme"
+	"github.com/gioui-plugins/widgets"
+	"github.com/gioui-plugins/window"
 	"golang.org/x/exp/shiny/materialdesign/icons"
-	"image/color"
 )
 
 var iconList = []string{
@@ -1945,38 +1939,49 @@ var iconMap = map[string][]byte{
 }
 
 func main() {
-	var ops op.Ops
-	go func() {
-		w := new(app.Window)
-		th := material.NewTheme()
-		color := color.NRGBA{R: 1, G: 1, B: 1, A: 255}
-		list := layout.List{Axis: layout.Vertical}
+	var clickable widget.Clickable
 
-		for {
-			e := w.Event()
-			switch e := e.(type) {
-			case app.DestroyEvent:
-				panic(e.Err)
-			case app.FrameEvent:
-				gtx := app.NewContext(&ops, e)
-				list.Layout(gtx, len(iconList), func(gtx layout.Context, index int) layout.Dimensions {
-					return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							return material.Label(th, unit.Sp(16), iconList[index]).Layout(gtx)
-						}),
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							return layout.Spacer{Width: unit.Dp(10)}.Layout(gtx)
-						}),
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							gtx.Constraints.Min.X = 100
-							icon, _ := widget.NewIcon(iconMap[iconList[index]])
-							return icon.Layout(gtx, color)
-						}),
-					)
-				})
-				e.Frame(gtx.Ops)
-			}
-		}
-	}()
-	app.Main()
+	var th = theme.NewTheme()
+	card := widgets.NewCard(th)
+	win := window.NewInitialize()
+	var scroll = widgets.NewScroll(th)
+	var elements []layout.Widget
+	for _, name := range iconList {
+		elements = append(elements, func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return widgets.Label(th, name).Layout(gtx)
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.Spacer{Width: unit.Dp(10)}.Layout(gtx)
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					gtx.Constraints.Min.X = 100
+					icon, _ := widget.NewIcon(iconMap[name])
+					return icon.Layout(gtx, th.Color.WarningColor)
+				}),
+			)
+		})
+	}
+	scroll.SetElementList(elements)
+	win.Title("Hello, Gio!").Size(800, 600)
+	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
+	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
+		layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return scroll.Layout(gtx)
+					})
+				}),
+				layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return widgets.DefaultButton(th, &clickable, "default", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+					})
+				}),
+			)
+		})
+	})
+	win.Run()
 }
