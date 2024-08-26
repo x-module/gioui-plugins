@@ -18,7 +18,6 @@ func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
 	card := widgets.NewCard(th)
-	w := new(app.Window)
 	bar := widgets.NewProgressBar(th, 0)
 	var start float32 = 0
 	win := window.NewInitialize()

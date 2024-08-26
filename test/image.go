@@ -16,7 +16,7 @@ func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
 	card := widgets.NewCard(th)
-	image := widgets.NewImage(th, "welcome.jpg")
+	image := widgets.NewImage(th, "test/welcome.jpg")
 	win := window.NewInitialize()
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)

@@ -58,7 +58,6 @@ func main() {
 						)
 					})
 				}),
-
 				layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
