@@ -15,7 +15,7 @@ func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
 	tips := widgets.NewTips(th)
-	win := window.NewInitialize()
+	win := window.NewInitialize(new(app.Window))
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {

@@ -10,6 +10,7 @@ package window
 
 import (
 	"gioui.org/app"
+	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
@@ -25,16 +26,18 @@ type (
 )
 
 type Initialize struct {
-	destroy DestroyFun
-	frame   FrameFun
-	win     *app.Window
-	options []app.Option
-	bgColor color.NRGBA
+	destroy      DestroyFun
+	frame        FrameFun
+	win          *app.Window
+	options      []app.Option
+	bgColor      color.NRGBA
+	init         bool
+	centerWindow bool
 }
 
-func NewInitialize() *Initialize {
+func NewInitialize(win *app.Window) *Initialize {
 	return &Initialize{
-		win: new(app.Window),
+		win: win,
 		destroy: func(err error) {
 			os.Exit(1)
 		},
@@ -43,6 +46,24 @@ func NewInitialize() *Initialize {
 
 func (i *Initialize) BackgroundColor(color color.NRGBA) {
 	i.bgColor = color
+}
+func (i *Initialize) NoActionBar() *Initialize {
+	i.win.Option(app.Decorated(false))
+	return i
+}
+func (i *Initialize) HaveActionBar() *Initialize {
+	i.win.Option(app.Decorated(true))
+	return i
+}
+
+func (i *Initialize) ReCenterWindow() *Initialize {
+	i.win.Option(i.options...)
+	i.win.Perform(system.ActionCenter)
+	return i
+}
+func (i *Initialize) CenterWindow() *Initialize {
+	i.centerWindow = true
+	return i
 }
 
 func (i *Initialize) Title(t string) *Initialize {
@@ -81,7 +102,17 @@ func (i *Initialize) Run() {
 					}
 					paint.FillShape(gtx.Ops, i.bgColor, rect.Op())
 				}
-				i.frame(gtx, ops, i.win)
+				layout.Stack{}.Layout(gtx,
+					layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+						if !i.init && i.centerWindow {
+							i.win.Option(i.options...)
+							i.win.Perform(system.ActionCenter)
+							i.init = true
+						}
+						i.frame(gtx, ops, i.win)
+						return layout.Dimensions{}
+					}),
+				)
 				e.Frame(gtx.Ops)
 			}
 		}

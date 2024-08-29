@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"gioui.org/font"
 	"gioui.org/io/semantic"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -172,7 +173,7 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return tabs.list.Layout(gtx, len(tabs.tabs), func(gtx layout.Context, tabIdx int) layout.Dimensions {
 				if tabs.width == 0 {
-					tabs.width = unit.Dp(gtx.Constraints.Max.X)
+					tabs.width = unit.Dp(gtx.Constraints.Min.X)
 				}
 				if tabIdx > len(tabs.tabs)-1 {
 					tabIdx = len(tabs.tabs) - 1
@@ -197,14 +198,16 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 							// return layout.UniformInset(unit.Dp(12)).Layout(gtx,
 							return layout.Inset{Top: unit.Dp(8), Bottom: unit.Dp(12), Left: unit.Dp(12), Right: unit.Dp(12)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 								textColor := tabs.theme.Color.DefaultTextWhiteColor
-								if t.btn.Hovered() {
-									textColor = tabs.theme.Color.GreenColor
-								}
-								if tabs.selected == tabIdx {
-									textColor = tabs.theme.Color.GreenColor
-								}
-
 								label := material.Label(tabs.theme.Material(), tabs.theme.Size.DefaultTextSize, t.Title)
+								label.Font.Weight = font.Normal
+								if tabs.selected == tabIdx {
+									textColor = tabs.theme.Color.SwitchTabSelectedTextColor
+									// label.Font.Weight = font.Bold
+								}
+								if t.btn.Hovered() {
+									textColor = tabs.theme.Color.SwitchTabHoverTextColor
+									// label.Font.Weight = font.Bold
+								}
 								label.Color = textColor
 								return label.Layout(gtx)
 							})
@@ -218,7 +221,7 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 						}
 						tabHeight := gtx.Dp(unit.Dp(2))
 						tabRect := image.Rect(0, 0, tabWidth, tabHeight)
-						paint.FillShape(gtx.Ops, tabs.theme.Color.DefaultBorderBlueColor, clip.Rect(tabRect).Op())
+						paint.FillShape(gtx.Ops, tabs.theme.Color.SwitchTabSelectedLineColor, clip.Rect(tabRect).Op())
 						return layout.Dimensions{
 							Size: image.Point{X: tabWidth, Y: tabHeight},
 						}

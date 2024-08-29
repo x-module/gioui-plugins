@@ -55,6 +55,7 @@ func Label(th *theme.Theme, txt string, bold ...bool) material.LabelStyle {
 	if len(bold) > 0 && bold[0] == true {
 		label.Font.Weight = font.Bold
 	}
+	label.TextSize = th.Size.DefaultTextSize
 	return label
 }
 func labelWithDefaultColor(th *theme.Theme, entry material.LabelStyle) material.LabelStyle {

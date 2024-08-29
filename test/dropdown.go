@@ -23,7 +23,7 @@ func main() {
 	card := widgets.NewCard(th)
 	// dropDown.SetOptions(options)
 	dropDown.SetWidth(unit.Dp(300))
-	win := window.NewInitialize()
+	win := window.NewInitialize(new(app.Window))
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {

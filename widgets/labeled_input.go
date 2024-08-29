@@ -24,9 +24,9 @@ func NewLabeledInput(th *theme.Theme, label string, hint string) *LabeledInput {
 		Hint:         hint,
 		SpaceBetween: 3,
 		labelWidth:   unit.Dp(50),
-		inputWidth:   th.Size.DefaultElementWidth,
+		// inputWidth:   th.Size.DefaultElementWidth,
 	}
-	labeledInput.input.SetWidth(labeledInput.inputWidth)
+	// labeledInput.input.SetWidth(labeledInput.inputWidth)
 	return labeledInput
 }
 
@@ -57,7 +57,9 @@ func (l *LabeledInput) GetText() string {
 }
 
 func (l *LabeledInput) Layout(gtx layout.Context) layout.Dimensions {
-	l.input.SetWidth(l.inputWidth)
+	// if l.inputWidth > 0 {
+	// 	l.input.SetWidth(l.inputWidth)
+	// }
 	return layout.Flex{
 		Axis:      layout.Horizontal,
 		Alignment: layout.Middle,

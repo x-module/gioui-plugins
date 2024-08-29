@@ -13,19 +13,14 @@ import (
 func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
-	win := window.NewInitialize()
+	win := window.NewInitialize(new(app.Window))
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
-		layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(layout.Spacer{Height: 100}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				gtx.Constraints.Max.X = 200
-				return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return material.Button(th.Material(), &clickable, "Hello, Gio!").Layout(gtx)
-				})
-			}),
-		)
+		layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			btn := material.Button(th.Material(), &clickable, "Right Aligned Button")
+			return btn.Layout(gtx)
+		})
 	})
 	win.Run()
 }

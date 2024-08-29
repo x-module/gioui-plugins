@@ -1,18 +1,18 @@
 package widgets
 
 import (
+	"gioui.org/font"
+	"gioui.org/io/pointer"
+	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
+	"gioui.org/unit"
+	"gioui.org/widget"
+	"gioui.org/x/component"
 	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
 	"image"
 	"image/color"
-
-	"gioui.org/io/pointer"
-	"gioui.org/layout"
-	"gioui.org/unit"
-	"gioui.org/widget"
-	"gioui.org/x/component"
 )
 
 type DropDown struct {
@@ -167,7 +167,7 @@ func NewDropDown(th *theme.Theme, options ...string) *DropDown {
 		cornerRadius: unit.Dp(4),
 		theme:        th,
 		menuInit:     true,
-		width:        th.Size.DefaultElementWidth,
+		// width:        th.Size.DefaultElementWidth,
 	}
 	if len(options) > 0 {
 		for _, opt := range options {
@@ -217,9 +217,9 @@ func (c *DropDown) GetSelected() *DropDownOption {
 }
 
 func (c *DropDown) box(gtx layout.Context, theme *theme.Theme, text string, maxWidth unit.Dp) layout.Dimensions {
-	borderColor := c.theme.Color.DefaultBorderGrayColor
+	borderColor := c.theme.Color.DropDownBorderColor
 	if c.isOpen {
-		borderColor = c.theme.Color.HoveredBorderBlueColor
+		borderColor = c.theme.Color.DropDownHoveredBorderColor
 	}
 
 	border := widget.Border{
@@ -235,7 +235,7 @@ func (c *DropDown) box(gtx layout.Context, theme *theme.Theme, text string, maxW
 	c.size.X = gtx.Dp(maxWidth)
 	return c.dropDown.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		if c.dropDown.Hovered() {
-			border.Color = c.theme.Color.HoveredBorderBlueColor
+			border.Color = c.theme.Color.DropDownHoveredBorderColor
 		}
 		return border.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			// calculate the minimum width of the box, considering icon and padding
@@ -255,7 +255,7 @@ func (c *DropDown) box(gtx layout.Context, theme *theme.Theme, text string, maxW
 					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle, Spacing: layout.SpaceBetween}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return layout.Inset{Top: unit.Dp(4), Bottom: unit.Dp(4)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+								return layout.Inset{Top: unit.Dp(3), Bottom: unit.Dp(3)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 									return Label(theme, text).Layout(gtx)
 								})
 							}),
@@ -356,7 +356,8 @@ func (c *DropDown) updateMenuItems(th *theme.Theme) {
 			}
 			itm.Label.TextSize = c.theme.Size.DropdownTextSize
 			if c.GetSelected().Text == opt.Text {
-				itm.Label.Color = c.theme.Color.GreenColor
+				itm.Label.Color = c.theme.Color.DropDownSelectedItemBgColor
+				itm.Label.Font.Weight = font.Bold
 				// itm.Icon = widgets.ActionStarRateIcon
 				// itm.IconSize = unit.Dp(16)
 				// itm.IconInset = outlay.Inset{}

@@ -35,6 +35,7 @@ type FlatButton struct {
 	HoveredBackgroundColor color.NRGBA
 	ClickedBackgroundColor color.NRGBA
 	TextColor              color.NRGBA
+	TextSize               unit.Sp
 	Text                   string
 
 	CornerRadius      int
@@ -64,13 +65,15 @@ func (f *FlatButton) Layout(gtx layout.Context) layout.Dimensions {
 	if f.TextColor == (color.NRGBA{}) {
 		f.TextColor = f.theme.Color.DefaultTextWhiteColor
 	}
+	if f.TextSize == 0 {
+		f.TextSize = unit.Sp(11)
+	}
 
 	axis := layout.Horizontal
 	labelLayout := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Right: unit.Dp(f.MarginRight)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			l := material.Label(f.theme.Material(), unit.Sp(11), f.Text)
+			l := material.Label(f.theme.Material(), f.TextSize, f.Text)
 			l.Color = f.TextColor
-			l.TextSize = unit.Sp(13)
 			// return Label(f.theme, f.Text).Layout(gtx)
 			return l.Layout(gtx)
 		})

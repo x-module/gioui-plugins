@@ -119,6 +119,7 @@ func (m *Menu) makeButton(option MenuItemOption, clickable *widget.Clickable) Fl
 		theme:                  m.theme,
 		Icon:                   option.Icon,
 		Text:                   option.Text,
+		TextSize:               unit.Sp(11),
 		IconPosition:           FlatButtonIconStart,
 		Clickable:              clickable,
 		SpaceBetween:           unit.Dp(3),

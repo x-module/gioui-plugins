@@ -1943,7 +1943,7 @@ func main() {
 
 	var th = theme.NewTheme()
 	card := widgets.NewCard(th)
-	win := window.NewInitialize()
+	win := window.NewInitialize(new(app.Window))
 	var scroll = widgets.NewScroll(th)
 	var elements []layout.Widget
 	for _, name := range iconList {

@@ -206,6 +206,27 @@ func SuccessButton(th *theme.Theme, button *widget.Clickable, txt string, width 
 	}
 	return b
 }
+func BlueButton(th *theme.Theme, button *widget.Clickable, txt string, width unit.Dp, inset ...layout.Inset) Button {
+	b := Button{
+		theme:        th,
+		Text:         txt,
+		Color:        th.Color.DefaultTextWhiteColor,
+		CornerRadius: th.Size.DefaultElementRadiusSize,
+		Background:   th.Color.BlueColor,
+		TextSize:     th.Size.DropdownTextSize,
+		bdColor:      th.Color.BlueColor,
+		Inset: layout.Inset{
+			Top: 8, Bottom: 8,
+			Left: 8, Right: 8,
+		},
+		Button: button,
+		width:  width,
+	}
+	if len(inset) > 0 {
+		b.Inset = inset[0]
+	}
+	return b
+}
 func SuccessOutlineButton(th *theme.Theme, button *widget.Clickable, txt string, width unit.Dp, inset ...layout.Inset) Button {
 	b := Button{
 		theme:        th,

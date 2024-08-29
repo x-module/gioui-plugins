@@ -56,7 +56,7 @@ func NewInput(th *theme.Theme, hint string, text ...string) *Input {
 	t := &Input{
 		theme:  th,
 		editor: widget.Editor{},
-		width:  th.Size.DefaultElementWidth,
+		// width:  th.Size.DefaultElementWidth,
 	}
 	t.size = th.Size.Medium
 	t.hint = hint
@@ -72,7 +72,7 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 		theme:  th,
 		editor: widget.Editor{},
 		height: unit.Dp(100),
-		width:  th.Size.DefaultElementWidth,
+		// width:  th.Size.DefaultElementWidth,
 	}
 	t.size = th.Size.Medium
 	t.hint = hint
@@ -168,26 +168,24 @@ func (i *Input) update(gtx layout.Context, th *theme.Theme) {
 
 	switch i.state {
 	case inactive:
-		i.borderColor = i.theme.Color.DefaultBorderGrayColor
+		i.borderColor = i.theme.Color.InputInactiveBorderColor
 	case hovered:
-		i.borderColor = i.theme.Color.HoveredBorderBlueColor
+		i.borderColor = i.theme.Color.InputHoveredBorderColor
 	case focused:
-		i.bgColor = i.theme.Color.FocusedBgColor
-		i.borderColor = i.theme.Color.FocusedBorderBlueColor
+		i.bgColor = i.theme.Color.InputFocusedBgColor
+		i.borderColor = i.theme.Color.InputFocusedBorderColor
 	case activated:
-		i.borderColor = i.theme.Color.DefaultBorderGrayColor
+		i.borderColor = i.theme.Color.InputActivatedBorderColor
 	}
 }
 
 func (i *Input) Layout(gtx layout.Context) layout.Dimensions {
 	if i.width > 0 {
 		gtx.Constraints.Max.X = gtx.Dp(i.width)
-	} else {
-		gtx.Constraints.Min.X = gtx.Constraints.Max.X
 	}
 	i.update(gtx, i.theme)
-	gtx.Constraints.Min.X = gtx.Constraints.Max.X
-	gtx.Constraints.Min.Y = 0
+	// gtx.Constraints.Min.X = gtx.Constraints.Max.X
+	// gtx.Constraints.Min.Y = 0
 	macro := op.Record(gtx.Ops)
 	dims := i.layout(gtx, i.theme)
 	call := macro.Stop()
@@ -216,8 +214,9 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 			func(gtx layout.Context) layout.Dimensions {
 				return i.size.Inset.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					inputLayout := layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-
-						gtx.Constraints.Max.X = gtx.Dp(i.width)
+						if i.width > 0 {
+							gtx.Constraints.Max.X = gtx.Dp(i.width)
+						}
 						editor := material.Editor(th.Material(), &i.editor, i.hint)
 						editor.HintColor = i.theme.Color.HintTextColor
 						editor.SelectionColor = i.theme.Color.TextSelectionColor

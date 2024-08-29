@@ -42,11 +42,11 @@ func (r *RadioButton) SetSize(size theme.ElementSize) {
 func (r *RadioButton) Layout(gtx layout.Context) layout.Dimensions {
 	iconColor := r.theme.Color.BorderLightGrayColor
 	if r.group.Value == r.key {
-		iconColor = r.theme.Color.ActivatedBorderBlueColor
+		iconColor = r.theme.Color.RadioSelectBgColor
 	}
 	return r.radioButton.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		if r.radioButton.Hovered() {
-			iconColor = r.theme.Color.HoveredBorderBlueColor
+			iconColor = r.theme.Color.RadioSelectBgColor
 		}
 		rb := material.RadioButton(r.theme.Material(), r.group, r.key, r.label)
 		rb.IconColor = iconColor

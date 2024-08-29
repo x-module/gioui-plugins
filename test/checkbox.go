@@ -21,7 +21,7 @@ func main() {
 	girl.SetSize(th.Size.Small)
 	three.SetSize(th.Size.Large)
 
-	win := window.NewInitialize()
+	win := window.NewInitialize(new(app.Window))
 	win.Title("Hello, Gio!").Size(800, 600)
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
