@@ -45,6 +45,8 @@ type Color struct {
 	DefaultLineColor          color.NRGBA
 	DefaultMaskBgColor        color.NRGBA
 
+	TableHeaderBgColor color.NRGBA
+
 	InputInactiveBorderColor  color.NRGBA
 	InputActiveBorderColor    color.NRGBA
 	InputHoveredBorderColor   color.NRGBA
@@ -236,6 +238,8 @@ func (t *Theme) dark() *Theme {
 	t.Color.DefaultBorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
 	t.Color.DefaultLineColor = color.NRGBA{R: 43, G: 45, B: 49, A: 255}
 	t.Color.DefaultMaskBgColor = color.NRGBA{R: 10, G: 10, B: 12, A: 230}
+
+	t.Color.TableHeaderBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 
 	t.Color.IconGrayColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
 	t.Color.BorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}

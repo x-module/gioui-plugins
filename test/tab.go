@@ -41,8 +41,11 @@ func main() {
 	})
 
 	tabs.SetWidth(unit.Dp(400))
-	win := window.NewInitialize(new(app.Window))
-	win.Title("Hello, Gio!").Size(800, 600)
+	win := window.NewApplication(new(app.Window))
+	win.Title("Hello, Gio!").Size(window.ElementSize{
+		Height: 600,
+		Width:  800,
+	})
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
 		fmt.Println("selected:", tabs.SelectedTab().Title)

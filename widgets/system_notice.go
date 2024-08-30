@@ -18,11 +18,11 @@ type SystemNotice struct {
 	message  string
 }
 
-func NewSystemNotice() (*SystemNotice, error) {
+func NewSystemNotice() *SystemNotice {
 	return &SystemNotice{
 		// iconPath: filepath.Join(absolutePath, icon),
 		iconPath: icon,
-	}, nil
+	}
 }
 
 func (s *SystemNotice) Notice(message string) error {

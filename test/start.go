@@ -22,8 +22,11 @@ func main() {
 	card := widgets.NewCard(th)
 	image := widgets.NewImage(th, "test/welcome.jpg")
 	win1 := new(app.Window)
-	win := window.NewInitialize(win1)
-	win.Title("Hello, Gio!").Size(600, 400)
+	win := window.NewApplication(win1)
+	win.Title("Hello, Gio!").Size(window.ElementSize{
+		Width:  600,
+		Height: 400,
+	})
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.NoActionBar().CenterWindow()
 	go func() {
@@ -31,7 +34,10 @@ func main() {
 			select {
 			case <-time.After(time.Second * 1):
 				change = !change
-				win.Size(800, 500).ReCenterWindow()
+				win.Size(window.ElementSize{
+					Width:  800,
+					Height: 500,
+				}).ReCenterWindow()
 				win1.Invalidate()
 				return
 			}
@@ -41,9 +47,15 @@ func main() {
 		if clickable.Clicked(gtx) {
 			fmt.Println("------click-----------")
 			if !change1 {
-				win.Size(1200, 900).HaveActionBar().ReCenterWindow()
+				win.Size(window.ElementSize{
+					Width:  1200,
+					Height: 900,
+				}).HaveActionBar().ReCenterWindow()
 			} else {
-				win.Size(1100, 800).HaveActionBar().ReCenterWindow()
+				win.Size(window.ElementSize{
+					Width:  1100,
+					Height: 800,
+				}).HaveActionBar().ReCenterWindow()
 			}
 			change1 = !change1
 		}

@@ -25,7 +25,12 @@ type (
 	FrameFun   func(gtx layout.Context, ops op.Ops, win *app.Window)
 )
 
-type Initialize struct {
+type ElementSize struct {
+	Width  int `yaml:"width"`
+	Height int `yaml:"height"`
+}
+
+type Application struct {
 	destroy      DestroyFun
 	frame        FrameFun
 	win          *app.Window
@@ -35,8 +40,8 @@ type Initialize struct {
 	centerWindow bool
 }
 
-func NewInitialize(win *app.Window) *Initialize {
-	return &Initialize{
+func NewApplication(win *app.Window) *Application {
+	return &Application{
 		win: win,
 		destroy: func(err error) {
 			os.Exit(1)
@@ -44,48 +49,48 @@ func NewInitialize(win *app.Window) *Initialize {
 	}
 }
 
-func (i *Initialize) BackgroundColor(color color.NRGBA) {
+func (i *Application) BackgroundColor(color color.NRGBA) {
 	i.bgColor = color
 }
-func (i *Initialize) NoActionBar() *Initialize {
+func (i *Application) NoActionBar() *Application {
 	i.win.Option(app.Decorated(false))
 	return i
 }
-func (i *Initialize) HaveActionBar() *Initialize {
+func (i *Application) HaveActionBar() *Application {
 	i.win.Option(app.Decorated(true))
 	return i
 }
 
-func (i *Initialize) ReCenterWindow() *Initialize {
+func (i *Application) ReCenterWindow() *Application {
 	i.win.Option(i.options...)
 	i.win.Perform(system.ActionCenter)
 	return i
 }
-func (i *Initialize) CenterWindow() *Initialize {
+func (i *Application) CenterWindow() *Application {
 	i.centerWindow = true
 	return i
 }
 
-func (i *Initialize) Title(t string) *Initialize {
+func (i *Application) Title(t string) *Application {
 	i.options = append(i.options, app.Title(t))
 	return i
 }
 
-func (i *Initialize) Size(width int, height int) *Initialize {
-	i.options = append(i.options, app.Size(unit.Dp(width), unit.Dp(height)))
-	i.options = append(i.options, app.MaxSize(unit.Dp(width), unit.Dp(height)))
-	i.options = append(i.options, app.MinSize(unit.Dp(width), unit.Dp(height)))
+func (i *Application) Size(size ElementSize) *Application {
+	i.options = append(i.options, app.Size(unit.Dp(size.Width), unit.Dp(size.Height)))
+	// i.options = append(i.options, app.MaxSize(unit.Dp(size.Width), unit.Dp(size.Height)))
+	// i.options = append(i.options, app.MinSize(unit.Dp(size.Width), unit.Dp(size.Height)))
 	return i
 }
 
-func (i *Initialize) Destroy(f func(err error)) {
+func (i *Application) Destroy(f func(err error)) {
 	i.destroy = f
 }
-func (i *Initialize) Frame(f FrameFun) {
+func (i *Application) Frame(f FrameFun) {
 	i.frame = f
 }
 
-func (i *Initialize) Run() {
+func (i *Application) Run() {
 	i.win.Option(i.options...)
 	var ops op.Ops
 	go func() {

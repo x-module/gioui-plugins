@@ -84,6 +84,11 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	return t
 }
 
+func (i *Input) SetHeight(height unit.Dp) *Input {
+	i.height = height
+	return i
+}
+
 func (i *Input) SetWidth(width unit.Dp) *Input {
 	i.width = width
 	return i
