@@ -11,15 +11,12 @@ package widgets
 import (
 	"fmt"
 	"gioui.org/f32"
-	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
-	"gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
-	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"gioui.org/x/outlay"
 	"github.com/x-module/gioui-plugins/theme"
@@ -80,28 +77,13 @@ func (g *Table) SetDataFun(dataFun outlay.Cell) *Table {
 }
 
 func (g *Table) LayoutTable(gtx layout.Context) D {
-	// Configure width based on available space and a minimum size.
-	// minSize := gtx.Dp(unit.Dp(200))
-
 	inset := layout.UniformInset(unit.Dp(2))
 
-	// Configure a label styled to be a heading.
-	headingLabel := material.Body1(g.theme.Material(), "")
-	headingLabel.Font.Weight = font.Bold
-	headingLabel.Alignment = text.Middle
-	headingLabel.MaxLines = 1
-
-	// Configure a label styled to be a data element.
-	dataLabel := material.Body1(g.theme.Material(), "")
-	dataLabel.Font.Typeface = "Go Mono"
-	dataLabel.MaxLines = 1
-	dataLabel.Alignment = text.End
-
-	// Measure the height of a heading row.
 	orig := gtx.Constraints
 	gtx.Constraints.Min = image.Point{}
 	macro := op.Record(gtx.Ops)
-	dims := inset.Layout(gtx, headingLabel.Layout)
+	// dims := inset.Layout(gtx, headingLabel.Layout)
+	dims := inset.Layout(gtx, layout.Spacer{Height: unit.Dp(30)}.Layout)
 	_ = macro.Stop()
 	gtx.Constraints = orig
 	keys := maps.Keys(g.data[0])
@@ -118,19 +100,15 @@ func (g *Table) LayoutTable(gtx layout.Context) D {
 		func(gtx layout.Context, index int) layout.Dimensions {
 			drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, g.theme.Color.TableHeaderBgColor)
 			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return inset.Layout(gtx, func(gtx C) D {
-					return Label(g.theme, g.header[index], true).Layout(gtx)
-				})
+				return Label(g.theme, g.header[index], true).Layout(gtx)
 			})
 		},
 		func(gtx C, row, col int) D {
-			return inset.Layout(gtx, func(gtx C) D {
-				dims1 := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return Label(g.theme, fmt.Sprint(g.data[row][keys[col]])).Layout(gtx)
-				})
-				NewLine(g.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
-				return dims1
+			dims1 := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return Label(g.theme, fmt.Sprint(g.data[row][keys[col]])).Layout(gtx)
 			})
+			NewLine(g.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
+			return dims1
 		},
 	)
 }
