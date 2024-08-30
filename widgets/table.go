@@ -36,7 +36,7 @@ type Table struct {
 	grid        component.GridState
 	headerFun   layout.ListElement
 	dataFun     outlay.Cell
-	header      []string
+	headers     []string
 	data        []map[string]any
 	dataContent []widget.Bool
 	keys        []string
@@ -51,7 +51,7 @@ func NewTable(th *theme.Theme) *Table {
 }
 
 func (t *Table) SetHeader(header []string) *Table {
-	t.header = header
+	t.headers = header
 	return t
 }
 func (t *Table) SetData(data []map[string]any) *Table {
@@ -80,14 +80,14 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 	orig := gtx.Constraints
 	gtx.Constraints.Min = image.Point{}
 	macro := op.Record(gtx.Ops)
-	dims := inset.Layout(gtx, layout.Spacer{Height: unit.Dp(30)}.Layout)
+	dims := inset.Layout(gtx, layout.Spacer{Height: t.height}.Layout)
 	_ = macro.Stop()
 	gtx.Constraints = orig
 	if t.headerFun == nil {
 		t.headerFun = func(gtx layout.Context, index int) layout.Dimensions {
 			t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.TableHeaderBgColor)
 			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return Label(t.theme, t.header[index], true).Layout(gtx)
+				return Label(t.theme, t.headers[index], true).Layout(gtx)
 			})
 		}
 	}
@@ -99,11 +99,11 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 				} else {
 					t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultWindowBgGrayColor)
 				}
-				dims := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				NewLine(t.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
+				labelDims := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return Label(t.theme, fmt.Sprint(t.data[row][t.keys[col]])).Layout(gtx)
 				})
-				NewLine(t.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
-				return dims
+				return labelDims
 			})
 		}
 	}
@@ -111,7 +111,7 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 		func(axis layout.Axis, index, constraint int) int {
 			switch axis {
 			case layout.Horizontal:
-				return constraint / len(t.header)
+				return constraint / len(t.headers)
 			default:
 				return dims.Size.Y
 			}
