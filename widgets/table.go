@@ -34,13 +34,12 @@ type Table struct {
 	theme       *theme.Theme
 	height      unit.Dp
 	grid        component.GridState
-	sizeFun     outlay.Dimensioner
 	headerFun   layout.ListElement
 	dataFun     outlay.Cell
 	header      []string
 	data        []map[string]any
 	dataContent []widget.Bool
-	dataBgColor color.NRGBA
+	keys        []string
 }
 
 func NewTable(th *theme.Theme) *Table {
@@ -51,128 +50,79 @@ func NewTable(th *theme.Theme) *Table {
 	return table
 }
 
-func (g *Table) SetHeader(header []string) *Table {
-	g.header = header
-	return g
+func (t *Table) SetHeader(header []string) *Table {
+	t.header = header
+	return t
 }
-func (g *Table) SetData(data []map[string]any) *Table {
-	g.data = data
+func (t *Table) SetData(data []map[string]any) *Table {
+	t.data = data
 	for range data {
-		g.dataContent = append(g.dataContent, widget.Bool{})
+		t.dataContent = append(t.dataContent, widget.Bool{})
 	}
-	return g
+	t.keys = maps.Keys(t.data[0])
+	return t
 }
 
-func (g *Table) SetSizeFun(sizeFun outlay.Dimensioner) *Table {
-	g.sizeFun = sizeFun
-	return g
+func (t *Table) SetHeaderFun(headerFun layout.ListElement) *Table {
+	t.headerFun = headerFun
+	return t
 }
-func (g *Table) SetHeaderFun(headerFun layout.ListElement) *Table {
-	g.headerFun = headerFun
-	return g
-}
-func (g *Table) SetDataFun(dataFun outlay.Cell) *Table {
-	g.dataFun = dataFun
-	return g
+func (t *Table) SetDataFun(dataFun outlay.Cell) *Table {
+	t.dataFun = dataFun
+	return t
 }
 
-func (g *Table) LayoutTable(gtx layout.Context) D {
+func (t *Table) LayoutTable(gtx layout.Context) D {
+	if len(t.data) == 0 {
+		return layout.Dimensions{}
+	}
 	inset := layout.UniformInset(unit.Dp(2))
-
 	orig := gtx.Constraints
 	gtx.Constraints.Min = image.Point{}
 	macro := op.Record(gtx.Ops)
-	// dims := inset.Layout(gtx, headingLabel.Layout)
 	dims := inset.Layout(gtx, layout.Spacer{Height: unit.Dp(30)}.Layout)
 	_ = macro.Stop()
 	gtx.Constraints = orig
-	keys := maps.Keys(g.data[0])
-
-	return component.Table(g.theme.Material(), &g.grid).Layout(gtx, len(g.data), len(g.data[0]),
-		func(axis layout.Axis, index, constraint int) int {
-			switch axis {
-			case layout.Horizontal:
-				return constraint / len(g.header)
-			default:
-				return dims.Size.Y
-			}
-		},
-		func(gtx layout.Context, index int) layout.Dimensions {
-			drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, g.theme.Color.TableHeaderBgColor)
+	if t.headerFun == nil {
+		t.headerFun = func(gtx layout.Context, index int) layout.Dimensions {
+			t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.TableHeaderBgColor)
 			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return Label(g.theme, g.header[index], true).Layout(gtx)
-			})
-		},
-		func(gtx C, row, col int) D {
-			dims1 := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return Label(g.theme, fmt.Sprint(g.data[row][keys[col]])).Layout(gtx)
-			})
-			NewLine(g.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
-			return dims1
-		},
-	)
-}
-
-func (g *Table) Layout(gtx layout.Context) layout.Dimensions {
-	g.check(gtx)
-	if len(g.data) == 0 {
-		return layout.Dimensions{}
-	}
-	table := component.Table(g.theme.Material(), &g.grid)
-	return table.Layout(gtx, len(g.data), len(g.data[0]),
-		g.sizeFun,
-		g.headerFun,
-		g.dataFun,
-	)
-}
-
-func (g *Table) check(gtx layout.Context) {
-	keys := maps.Keys(g.data[0])
-	if g.header == nil {
-		g.header = keys
-	}
-
-	if g.sizeFun == nil {
-		g.sizeFun = func(axis layout.Axis, index, constraint int) int {
-			switch axis {
-			case layout.Horizontal:
-				return constraint / len(g.header)
-			default:
-				return 100
-			}
-		}
-	}
-	if g.headerFun == nil {
-		g.headerFun = func(gtx layout.Context, index int) layout.Dimensions {
-			drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, g.theme.Color.TableHeaderBgColor)
-			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return Label(g.theme, g.header[index], true).Layout(gtx)
+				return Label(t.theme, t.header[index], true).Layout(gtx)
 			})
 		}
 	}
-	if g.dataFun == nil {
-		g.dataFun = func(gtx layout.Context, row, col int) layout.Dimensions {
-			return g.dataContent[row].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				if g.dataContent[row].Hovered() {
-					drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, g.theme.Color.DefaultContentBgGrayColor)
-					g.dataBgColor = g.theme.Color.DefaultContentBgGrayColor
+	if t.dataFun == nil {
+		t.dataFun = func(gtx layout.Context, row, col int) layout.Dimensions {
+			return t.dataContent[row].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				if t.dataContent[row].Hovered() {
+					t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultContentBgGrayColor)
 				} else {
-					drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, g.theme.Color.DefaultWindowBgGrayColor)
-					g.dataBgColor = g.theme.Color.DefaultWindowBgGrayColor
+					t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultWindowBgGrayColor)
 				}
-				g.dataBgColor = g.theme.Color.DefaultWindowBgGrayColor
 				dims := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return Label(g.theme, fmt.Sprint(g.data[row][keys[col]])).Layout(gtx)
+					return Label(t.theme, fmt.Sprint(t.data[row][t.keys[col]])).Layout(gtx)
 				})
-				NewLine(g.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
+				NewLine(t.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
 				return dims
 			})
 		}
 	}
+	return component.Table(t.theme.Material(), &t.grid).Layout(gtx, len(t.data), len(t.data[0]),
+		func(axis layout.Axis, index, constraint int) int {
+			switch axis {
+			case layout.Horizontal:
+				return constraint / len(t.header)
+			default:
+				return dims.Size.Y
+			}
+		},
+		t.headerFun,
+		t.dataFun,
+	)
 }
 
 // drawBackground 在给定的尺寸上绘制一个背景颜色
-func drawBackground(gtx layout.Context, size image.Point, col color.NRGBA) {
+func (t *Table) drawBackground(gtx layout.Context, size image.Point, col color.NRGBA) {
 	defer clip.Rect{Max: size}.Push(gtx.Ops).Pop()
 	paint.Fill(gtx.Ops, col)
 }
