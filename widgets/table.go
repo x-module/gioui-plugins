@@ -13,16 +13,14 @@ import (
 	"gioui.org/f32"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/op/clip"
-	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/x/component"
 	"gioui.org/x/outlay"
 	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/utils"
 	"golang.org/x/exp/maps"
 	"image"
-	"image/color"
 )
 
 type (
@@ -85,7 +83,7 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 	gtx.Constraints = orig
 	if t.headerFun == nil {
 		t.headerFun = func(gtx layout.Context, index int) layout.Dimensions {
-			t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.TableHeaderBgColor)
+			utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.TableHeaderBgColor)
 			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return Label(t.theme, t.headers[index], true).Layout(gtx)
 			})
@@ -95,9 +93,9 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 		t.dataFun = func(gtx layout.Context, row, col int) layout.Dimensions {
 			return t.dataContent[row].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				if t.dataContent[row].Hovered() {
-					t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultContentBgGrayColor)
+					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultContentBgGrayColor)
 				} else {
-					t.drawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultWindowBgGrayColor)
+					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultWindowBgGrayColor)
 				}
 				NewLine(t.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
 				labelDims := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -119,10 +117,4 @@ func (t *Table) LayoutTable(gtx layout.Context) D {
 		t.headerFun,
 		t.dataFun,
 	)
-}
-
-// drawBackground 在给定的尺寸上绘制一个背景颜色
-func (t *Table) drawBackground(gtx layout.Context, size image.Point, col color.NRGBA) {
-	defer clip.Rect{Max: size}.Push(gtx.Ops).Pop()
-	paint.Fill(gtx.Ops, col)
 }

@@ -18,6 +18,7 @@ func main() {
 		Height: 600,
 		Width:  800,
 	})
+
 	grid := widgets.NewTable(th)
 	data := []map[string]any{
 		{"name": "one", "age": 1, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
@@ -29,6 +30,7 @@ func main() {
 	}
 	grid.SetData(data)
 	grid.SetHeader([]string{"Name", "Age", "Class", "BirthDay", "Address"})
+
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
 		layout.UniformInset(unit.Dp(0)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {

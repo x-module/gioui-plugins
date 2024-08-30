@@ -8,7 +8,13 @@
 
 package utils
 
-import "image/color"
+import (
+	"gioui.org/layout"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
+	"image"
+	"image/color"
+)
 
 func MulAlpha(c color.NRGBA, alpha uint8) color.NRGBA {
 	c.A = uint8(uint32(c.A) * uint32(alpha) / 0xFF)
@@ -43,4 +49,10 @@ func approxLuminance(c color.NRGBA) byte {
 		t = r + g + b
 	)
 	return byte((r*int(c.R) + g*int(c.G) + b*int(c.B)) / t)
+}
+
+// DrawBackground 在给定的尺寸上绘制一个背景颜色
+func DrawBackground(gtx layout.Context, size image.Point, col color.NRGBA) {
+	defer clip.Rect{Max: size}.Push(gtx.Ops).Pop()
+	paint.Fill(gtx.Ops, col)
 }
