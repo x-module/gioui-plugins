@@ -32,7 +32,7 @@ func main() {
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
 		layout.UniformInset(unit.Dp(0)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return grid.Layout(gtx)
+			return grid.LayoutTable(gtx)
 		})
 	})
 	win.Run()
