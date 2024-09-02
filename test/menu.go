@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -16,28 +15,29 @@ import (
 func main() {
 	th := theme.NewTheme()
 	menu := widgets.NewMenu(th)
-	menuItemOptions := []widgets.MenuItemOption{
-		{Icon: resource.ActionPermIdentityIcon, Text: "ACCOUNT  ", MarginRight: 0,
-			SubMenu: []widgets.MenuItemOption{
-				{Icon: resource.NavigationSubdirectoryArrowRightIcon, Text: "LOGIN   "},
-				{Icon: resource.NavigationSubdirectoryArrowRightIcon, Text: "LOGOUT"},
+	menuItemOptions := []widgets.MenuItem{
+		{Icon: resource.ActionPermIdentityIcon, Text: "Account",
+			SubMenu: []widgets.MenuItem{
+				{Text: "Login"},
+				{Text: "Logout"},
 			},
 		},
-		{Icon: resource.EditorFunctionsIcon, Text: "RPC          ", MarginRight: 0},
-		{Icon: resource.EditorBorderAllIcon, Text: "GENERATE", MarginRight: 0,
-			SubMenu: []widgets.MenuItemOption{
-				{Icon: resource.NavigationSubdirectoryArrowRightIcon, Text: "CONFIG"},
-				{Icon: resource.NavigationSubdirectoryArrowRightIcon, Text: "CODE   "},
+		{Icon: resource.EditorFunctionsIcon, Text: "RPC"},
+		{Icon: resource.EditorBorderAllIcon, Text: "Generate",
+			SubMenu: []widgets.MenuItem{
+				{Text: "config"},
+				{Text: "code"},
 			},
 		},
-		{Icon: resource.MapsDirectionsRunIcon, Text: "MATCH     ", MarginRight: 0},
+		{Icon: resource.MapsDirectionsRunIcon, Text: "Match"},
+		{Icon: resource.SettingsIcon, Text: "Settings",
+			SubMenu: []widgets.MenuItem{
+				{Text: "setting"},
+				{Text: "Exit"},
+			},
+		},
 	}
-
-	menu.SetClickCallback(func(main int, sub int) {
-		fmt.Println("===============clicked================ main:", main, " sub:", sub)
-	})
 	menu.SetMenuItemOptions(menuItemOptions)
-
 	win := window.NewApplication(new(app.Window))
 	win.Title("Hello, Gio!").Size(window.ElementSize{
 		Height: 600,
@@ -50,7 +50,7 @@ func main() {
 				return menu.Layout(gtx)
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return utils.DrawLine(gtx, th.Palette.Fg, unit.Dp(gtx.Constraints.Max.Y), unit.Dp(1))
+				return utils.DrawLine(gtx, th.Color.DefaultLineColor, unit.Dp(gtx.Constraints.Max.Y), unit.Dp(1))
 			}),
 			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
 				// utils.ColorBackground(gtx, gtx.Constraints.Max, th.Palette.Bg)

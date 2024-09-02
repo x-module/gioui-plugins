@@ -118,6 +118,9 @@ type Color struct {
 	JsonNumberColor   color.NRGBA
 	JsonBoolColor     color.NRGBA
 	JsonNullColor     color.NRGBA
+
+	MenuItemTextColor         color.NRGBA
+	MenuItemTextSelectedColor color.NRGBA
 }
 
 type Theme struct {
@@ -310,6 +313,9 @@ func (t *Theme) dark() *Theme {
 	t.Color.JsonNumberColor = color.NRGBA{R: 41, G: 159, B: 171, A: 255}
 	t.Color.JsonBoolColor = color.NRGBA{R: 161, G: 112, B: 88, A: 255}
 	t.Color.JsonNullColor = color.NRGBA{R: 170, G: 118, B: 93, A: 255}
+
+	t.Color.MenuItemTextColor = color.NRGBA{R: 150, G: 150, B: 150, A: 255}
+	t.Color.MenuItemTextSelectedColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 
 	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}

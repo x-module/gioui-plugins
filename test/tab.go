@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -9,8 +8,10 @@ import (
 	"gioui.org/widget"
 	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/gioui-plugins/utils"
 	"github.com/x-module/gioui-plugins/widgets"
 	"github.com/x-module/gioui-plugins/window"
+	"image"
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 	})
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
-		fmt.Println("selected:", tabs.SelectedTab().Title)
+		// fmt.Println("selected:", tabs.SelectedTab().Title)
 		layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
@@ -57,7 +58,16 @@ func main() {
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return tabs.Layout(gtx)
 							}),
-							layout.Rigid(tabs.CurrentTab()),
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								// gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(300))
+								utils.DrawBackground(gtx, image.Point{
+									X: gtx.Constraints.Max.X,
+									Y: gtx.Constraints.Min.Y,
+								}, th.Color.DefaultWindowBgGrayColor)
+								return layout.Inset{Top: unit.Dp(150), Left: unit.Dp(200), Bottom: unit.Dp(150)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+									return tabs.CurrentTab(gtx)
+								})
+							}),
 						)
 					})
 				}),

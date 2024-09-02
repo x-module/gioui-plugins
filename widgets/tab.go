@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"fmt"
 	"gioui.org/font"
 	"gioui.org/io/semantic"
 	"gioui.org/layout"
@@ -23,6 +24,7 @@ type Tabs struct {
 	onSelectedChange func(Tab)
 	width            unit.Dp
 	currentTab       layout.Widget
+	slider           Slider
 }
 
 type Tab struct {
@@ -52,8 +54,8 @@ func (tabs *Tabs) SetTabs(items []*Tab) {
 	tabs.currentTab = items[0].Content
 }
 
-func (tabs *Tabs) CurrentTab() layout.Widget {
-	return tabs.currentTab
+func (tabs *Tabs) CurrentTab(gtx layout.Context) layout.Dimensions {
+	return tabs.slider.Layout(gtx, tabs.currentTab)
 }
 
 func (tabs *Tabs) SetWidth(width unit.Dp) {
@@ -182,6 +184,13 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 				t := tabs.tabs[tabIdx]
 
 				if t.btn.Clicked(gtx) {
+					if tabs.selected < tabIdx {
+						fmt.Println("PushLeft")
+						tabs.slider.PushLeft()
+					} else if tabs.selected > tabIdx {
+						fmt.Println("PushRight")
+						tabs.slider.PushRight()
+					}
 					tabs.selected = tabIdx
 					tabs.currentTab = t.Content
 					if tabs.onSelectedChange != nil {

@@ -9,216 +9,131 @@
 package widgets
 
 import (
+	"gioui.org/f32"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
+	"gioui.org/widget/material"
 	"github.com/x-module/gioui-plugins/theme"
-	"github.com/x-module/gioui-plugins/utils"
 )
 
 type Menu struct {
-	theme           *theme.Theme
-	list            *widget.List
-	Items           []MenuItem
-	menuItemOptions []MenuItemOption
-	clicks          [][]*widget.Clickable
-	clicked         int
-	clickCallback   func(main int, sub int)
-
-	parentIndex int
-	subIndex    int
+	theme        *theme.Theme
+	list         widget.List
+	menuItems    []MenuItem
+	textSize     unit.Sp
+	clickedIndex int
 }
 
 func NewMenu(th *theme.Theme) *Menu {
 	return &Menu{
-		theme:   th,
-		clicked: 100,
-		list: &widget.List{
+		theme: th,
+		list: widget.List{
 			List: layout.List{
 				Axis: layout.Vertical,
-				// ScrollToEnd: true,
 			},
 		},
+		textSize: unit.Sp(13),
 	}
-}
-
-type MenuItemOption struct {
-	Icon        *widget.Icon
-	Text        string
-	MarginRight int
-	MarginLeft  int
-	SubMenu     []MenuItemOption
-	Target      func()
 }
 
 type MenuItem struct {
-	Content layout.Widget
-}
-
-func (m *Menu) SetClickCallback(callback func(main int, sub int)) {
-	m.clickCallback = callback
+	Icon     *widget.Icon
+	Text     string
+	SubMenu  []MenuItem
+	click    widget.Clickable
+	selected bool
+	list     widget.List
 }
 
 // SetMenuItemOptions 设置menuItemOptions
-func (m *Menu) SetMenuItemOptions(options []MenuItemOption) {
-	m.menuItemOptions = options
-	for key := range m.menuItemOptions {
-		d := key
-		m.Items = append(m.Items, MenuItem{
-			Content: func(gtx layout.Context) layout.Dimensions {
-				return m.generateMenu(gtx, d, m.theme)
+func (m *Menu) SetMenuItemOptions(menuItems []MenuItem) {
+	for i := range menuItems {
+		menuItems[i].list = widget.List{
+			List: layout.List{
+				Axis: layout.Vertical,
 			},
-		})
+		}
 	}
+	m.menuItems = menuItems
 }
 
-func (m *MenuItem) Layout(gtx layout.Context) layout.Dimensions {
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return m.Content(gtx)
-		}),
-	)
-}
-
-func (m *Menu) copyMenuItem(item MenuItem) MenuItem {
-	return MenuItem{
-		Content: item.Content,
-	}
-}
-
-// Layout
-func (m *Menu) action(gtx layout.Context) {
-	for i, cs := range m.clicks {
-		for s, c := range cs {
-			for c.Clicked(gtx) {
-				if s == 0 {
-					if m.clicked == i {
-						m.clicked = 1000
-					} else {
-						m.clicked = i
-					}
-				}
-				m.parentIndex = i
-				m.subIndex = s
-				if m.clickCallback != nil {
-					m.clickCallback(i, s)
+func (m *MenuItem) layout(gtx layout.Context, parent *Menu, haasLine bool) layout.Dimensions {
+	if m.click.Clicked(gtx) {
+		for i := range parent.menuItems {
+			parent.menuItems[i].selected = false
+			for j := range parent.menuItems[i].SubMenu {
+				parent.menuItems[i].SubMenu[j].selected = false
+			}
+		}
+		m.selected = true
+		for i, menu := range parent.menuItems {
+			for _, subMenu := range menu.SubMenu {
+				if subMenu.selected {
+					parent.menuItems[i].selected = true
 				}
 			}
 		}
 	}
-}
-func (m *Menu) Layout(gtx layout.Context) layout.Dimensions {
-	m.action(gtx)
 
-	return m.list.Layout(gtx, len(m.Items), func(gtx layout.Context, index int) layout.Dimensions {
-		return m.Items[index].Layout(gtx)
-	})
-}
-func (m *Menu) makeButton(option MenuItemOption, clickable *widget.Clickable) FlatButton {
-	return FlatButton{
-		theme:                  m.theme,
-		Icon:                   option.Icon,
-		Text:                   option.Text,
-		TextSize:               unit.Sp(11),
-		IconPosition:           FlatButtonIconStart,
-		Clickable:              clickable,
-		SpaceBetween:           unit.Dp(3),
-		BackgroundPadding:      unit.Dp(0),
-		CornerRadius:           0,
-		MinWidth:               unit.Dp(160),
-		BackgroundColor:        m.theme.Color.DefaultContentBgGrayColor,
-		HoveredBackgroundColor: m.theme.Color.MenuHoveredBgColor,
-		ClickedBackgroundColor: m.theme.Color.MenuSelectedBgColor,
-		TextColor:              m.theme.Color.DefaultTextWhiteColor,
-		ContentPadding:         unit.Dp(4),
-		MarginRight:            option.MarginRight,
-		MarginLeft:             option.MarginLeft,
+	textColor := parent.theme.Color.MenuItemTextColor
+	if (m.click.Hovered() || m.selected) && m.SubMenu == nil {
+		textColor = parent.theme.Color.MenuItemTextSelectedColor
 	}
-}
-func (m *Menu) makeSubButton(option MenuItemOption, clickable *widget.Clickable) FlatButton {
-	return FlatButton{
-		theme:                  m.theme,
-		Icon:                   option.Icon,
-		Text:                   option.Text,
-		IconPosition:           FlatButtonIconStart,
-		Clickable:              clickable,
-		SpaceBetween:           unit.Dp(2),
-		BackgroundPadding:      unit.Dp(0),
-		CornerRadius:           0,
-		MinWidth:               unit.Dp(160),
-		BackgroundColor:        m.theme.Color.DefaultContentBgGrayColor,
-		HoveredBackgroundColor: m.theme.Color.MenuHoveredBgColor,
-		ClickedBackgroundColor: m.theme.Color.MenuSelectedBgColor,
-		TextColor:              m.theme.Color.DefaultTextWhiteColor,
-		ContentPadding:         unit.Dp(3),
-		MarginRight:            option.MarginRight,
-		MarginLeft:             25,
-		IconSize:               unit.Dp(15),
-	}
-}
-func (m *Menu) generateMenu(gtx layout.Context, key int, th *theme.Theme) layout.Dimensions {
-	for key := range m.menuItemOptions {
-		scli := []*widget.Clickable{
-			new(widget.Clickable),
-		}
-		if m.menuItemOptions[key].SubMenu != nil {
-			for range m.menuItemOptions[key].SubMenu {
-				scli = append(scli, new(widget.Clickable))
-			}
-		}
-		m.clicks = append(m.clicks, scli)
-	}
-	return layout.Inset{Left: unit.Dp(0), Right: unit.Dp(0), Top: unit.Dp(0), Bottom: unit.Dp(0)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+
+	return m.click.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						button := m.makeButton(m.menuItemOptions[key], m.clicks[key][0])
-						if m.subIndex != 0 && m.parentIndex == key {
-							button.TextColor = m.theme.Color.GreenColor
+						if m.Icon != nil {
+							gtx.Constraints.Max.X = gtx.Dp(unit.Dp(17))
+							return m.Icon.Layout(gtx, textColor)
 						}
-						return button.Layout(gtx)
+						return layout.Dimensions{}
 					}),
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return utils.DrawLine(gtx, m.theme.Color.DefaultLineColor, unit.Dp(1), unit.Dp(160))
+						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+							label := material.Label(parent.theme.Material(), unit.Sp(13), m.Text)
+							label.Color = textColor
+							return label.Layout(gtx)
+						})
 					}),
 				)
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				if m.clicked != key {
-					return layout.Dimensions{}
-				} else {
-					if m.menuItemOptions[key].SubMenu != nil {
-						var subMenu []layout.FlexChild
-						for i := range m.menuItemOptions[key].SubMenu {
-							buttons := m.makeSubButton(m.menuItemOptions[key].SubMenu[i], m.clicks[key][i+1])
-							subMenu = append(subMenu, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										return layout.Inset{}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-											if m.parentIndex == key && m.subIndex == (i+1) {
-												buttons.TextColor = m.theme.Color.GreenColor
-											}
-											return buttons.Layout(gtx)
-										})
-									}),
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-										return utils.DrawLine(gtx, m.theme.Color.DefaultLineColor, unit.Dp(1), unit.Dp(160))
-									}),
-								)
-							}))
-						}
-						return layout.N.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-							return layout.Inset{Left: unit.Dp(0)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Vertical}.Layout(gtx, subMenu...)
+				if m.selected && m.SubMenu != nil {
+					return layout.Inset{Top: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return m.list.Layout(gtx, len(m.SubMenu), func(gtx layout.Context, index int) layout.Dimensions {
+							gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(25))
+							gtx.Constraints.Min.X = gtx.Dp(unit.Dp(70))
+							return layout.Inset{Left: unit.Dp(30)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+								return m.SubMenu[index].layout(gtx, parent, false)
 							})
 						})
-
-					}
+					})
+				}
+				return layout.Dimensions{}
+			}),
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				if haasLine {
+					return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return NewLine(parent.theme).Color(parent.theme.Color.DefaultLineColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
+					})
+				} else {
 					return layout.Dimensions{}
 				}
 			}),
-			// utils.DrawLineFlex(resource.DefaultLineColor, unit.Dp(1), unit.Dp(160)),
 		)
+	})
+}
+
+func (m *Menu) Layout(gtx layout.Context) layout.Dimensions {
+	return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(5), Left: unit.Dp(15), Right: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+		return m.list.Layout(gtx, len(m.menuItems), func(gtx layout.Context, index int) layout.Dimensions {
+			gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(30))
+			gtx.Constraints.Min.X = gtx.Dp(unit.Dp(100))
+			return m.menuItems[index].layout(gtx, m, true)
+		})
 	})
 }
