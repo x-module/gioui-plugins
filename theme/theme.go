@@ -121,6 +121,10 @@ type Color struct {
 
 	MenuItemTextColor         color.NRGBA
 	MenuItemTextSelectedColor color.NRGBA
+
+	CloseIconColor color.NRGBA
+	MinIconColor   color.NRGBA
+	FullIconColor  color.NRGBA
 }
 
 type Theme struct {
@@ -316,6 +320,10 @@ func (t *Theme) dark() *Theme {
 
 	t.Color.MenuItemTextColor = color.NRGBA{R: 150, G: 150, B: 150, A: 255}
 	t.Color.MenuItemTextSelectedColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+
+	t.Color.CloseIconColor = color.NRGBA{R: 255, G: 95, B: 86, A: 255}
+	t.Color.MinIconColor = color.NRGBA{R: 255, G: 188, B: 45, A: 255}
+	t.Color.FullIconColor = color.NRGBA{R: 43, G: 200, B: 64, A: 255}
 
 	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}

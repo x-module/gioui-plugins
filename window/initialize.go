@@ -49,6 +49,10 @@ func NewApplication(win *app.Window) *Application {
 	}
 }
 
+func (i *Application) GetWin() *app.Window {
+	return i.win
+}
+
 func (i *Application) BackgroundColor(color color.NRGBA) {
 	i.bgColor = color
 }

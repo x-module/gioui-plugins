@@ -217,3 +217,23 @@ var NavigationCancelIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationCancel)
 	return icon
 }()
+
+var ActionCloseIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ContentClear)
+	return icon
+}()
+
+var ActionPointIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.AVFiberManualRecord)
+	return icon
+}()
+
+var ActionMinIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ContentRemove)
+	// icon, _ := widget.NewIcon(icons.NotificationDoNotDisturbOn)
+	return icon
+}()
+var ActionFullIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionOpenWith)
+	return icon
+}()
