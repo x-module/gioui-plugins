@@ -23,7 +23,7 @@ func main() {
 		Height: 600,
 		Width:  800,
 	})
-	tipArea := widgets.NewTooltip(th)
+	var hover widgets.HoverArea
 	// var tipIconButton component.TipIconButton
 	var content widget.Bool
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
@@ -35,9 +35,12 @@ func main() {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					return content.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						return tipArea.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						tip := widgets.NewHover(th.Material(), func(gtx layout.Context) layout.Dimensions {
+							return widgets.Label(th, "hover").Layout(gtx)
+						})
+						return hover.Layout(gtx, tip, func(gtx layout.Context) layout.Dimensions {
 							return widgets.Label(th, "hello").Layout(gtx)
-						}, "sssssss")
+						})
 					})
 				}),
 				layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
