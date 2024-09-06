@@ -55,9 +55,10 @@ func NewHover(th *material.Theme, w layout.Widget) Hover {
 }
 
 // Layout renders the tooltip.
-func (t Hover) Layout(gtx C) D {
+// func (t Hover) Layout(gtx layout.Context) layout.Dimensions {
+func (t Hover) Layout(gtx layout.Context) layout.Dimensions {
 	return layout.Stack{}.Layout(gtx,
-		layout.Expanded(func(gtx C) D {
+		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
 			radius := gtx.Dp(t.CornerRadius)
 			paint.FillShape(gtx.Ops, t.Bg, clip.RRect{
 				Rect: image.Rectangle{
@@ -68,9 +69,9 @@ func (t Hover) Layout(gtx C) D {
 				SW: radius,
 				SE: radius,
 			}.Op(gtx.Ops))
-			return D{}
+			return layout.Dimensions{}
 		}),
-		layout.Stacked(func(gtx C) D {
+		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return t.Inset.Layout(gtx, t.widget)
 		}),
 	)
@@ -97,7 +98,7 @@ func (i *InvalidateDeadline) SetTarget(t time.Time) {
 // Process checks the current frame time and either requests a future invalidation
 // or does nothing. It returns whether the current frame is the frame requested
 // by the last call to SetTarget.
-func (i *InvalidateDeadline) Process(gtx C) bool {
+func (i *InvalidateDeadline) Process(gtx layout.Context) bool {
 	if !i.Active {
 		return false
 	}
@@ -145,7 +146,7 @@ const (
 
 // Layout renders the provided widget with the provided tooltip. The tooltip
 // will be summoned if the widget is hovered or long-pressed.
-func (t *HoverArea) Layout(gtx C, tip Hover, w layout.Widget) D {
+func (t *HoverArea) Layout(gtx layout.Context, tip Hover, w layout.Widget) layout.Dimensions {
 	if !t.init {
 		t.init = true
 		t.VisibilityAnimation.State = component.Invisible
@@ -204,7 +205,7 @@ func (t *HoverArea) Layout(gtx C, tip Hover, w layout.Widget) D {
 	}
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(w),
-		layout.Expanded(func(gtx C) D {
+		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
 			defer pointer.PassOp{}.Push(gtx.Ops).Pop()
 			defer clip.Rect(image.Rectangle{Max: gtx.Constraints.Min}).Push(gtx.Ops).Pop()
 			event.Op(gtx.Ops, t)
@@ -224,7 +225,7 @@ func (t *HoverArea) Layout(gtx C, tip Hover, w layout.Widget) D {
 				call = macro.Stop()
 				op.Defer(gtx.Ops, call)
 			}
-			return D{}
+			return layout.Dimensions{}
 		}),
 	)
 }

@@ -23,11 +23,6 @@ import (
 	"image"
 )
 
-type (
-	C = layout.Context
-	D = layout.Dimensions
-)
-
 type Table struct {
 	theme       *theme.Theme
 	height      unit.Dp
@@ -70,7 +65,7 @@ func (t *Table) SetDataFun(dataFun outlay.Cell) *Table {
 	return t
 }
 
-func (t *Table) LayoutTable(gtx layout.Context) D {
+func (t *Table) LayoutTable(gtx layout.Context) layout.Dimensions {
 	if len(t.data) == 0 {
 		return layout.Dimensions{}
 	}

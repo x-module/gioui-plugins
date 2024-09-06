@@ -38,6 +38,7 @@ type Size struct {
 type Color struct {
 	DefaultWindowBgGrayColor  color.NRGBA
 	DefaultContentBgGrayColor color.NRGBA
+	CardBgColor               color.NRGBA
 	DefaultBgGrayColor        color.NRGBA
 	DefaultTextWhiteColor     color.NRGBA
 	DefaultBorderGrayColor    color.NRGBA
@@ -288,6 +289,8 @@ func (t *Theme) dark() *Theme {
 	t.Color.PrimaryColor = color.NRGBA{R: 99, G: 226, B: 184, A: 255}
 	t.Color.ButtonDefaultColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 	t.Color.ButtonTertiaryColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
+
+	t.Color.CardBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 
 	t.Color.SwitchTabHoverTextColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	t.Color.SwitchTabSelectedTextColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}

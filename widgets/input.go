@@ -150,6 +150,8 @@ func (i *Input) update(gtx layout.Context, th *theme.Theme) {
 		switch ev.Kind {
 		case gesture.KindPress:
 			gtx.Execute(key.FocusCmd{Tag: &i.editor})
+		case gesture.KindClick:
+
 		default:
 
 		}

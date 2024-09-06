@@ -59,7 +59,7 @@ func (c *Card) Layout(gtx layout.Context, children layout.Widget) layout.Dimensi
 				Y: gtx.Constraints.Min.Y,
 			}}, c.radius)
 			defer rect.Push(gtx.Ops).Pop()
-			return fill(gtx, c.theme.Color.DefaultContentBgGrayColor)
+			return fill(gtx, c.theme.Color.CardBgColor)
 		}),
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return layout.UniformInset(c.padding).Layout(gtx, children)
