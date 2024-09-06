@@ -50,6 +50,9 @@ type Input struct {
 
 	showPassword bool
 	onIconClick  func()
+
+	onFocus     func()
+	onLostFocus func()
 }
 
 func NewInput(th *theme.Theme, hint string, text ...string) *Input {
@@ -82,6 +85,15 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	}
 	t.editor.SingleLine = false
 	return t
+}
+
+func (i *Input) SetOnFocus(f func()) *Input {
+	i.onFocus = f
+	return i
+}
+func (i *Input) SetOnLostFocus(f func()) *Input {
+	i.onLostFocus = f
+	return i
 }
 
 func (i *Input) SetHeight(height unit.Dp) *Input {
@@ -141,6 +153,15 @@ func (i *Input) GetText() string {
 	return i.editor.Text()
 }
 func (i *Input) update(gtx layout.Context, th *theme.Theme) {
+	if gtx.Focused(&i.editor) {
+		if i.onFocus != nil {
+			i.onFocus()
+		}
+	} else {
+		if i.onLostFocus != nil {
+			i.onLostFocus()
+		}
+	}
 	disabled := gtx.Source == (input.Source{})
 	for {
 		ev, ok := i.click.Update(gtx.Source)

@@ -13,11 +13,13 @@ import (
 
 func main() {
 	var th = theme.NewTheme()
-	richText := widgets.NewRichText(th).AddSpan(richtext.SpanStyle{
-		Content:     "Hello ",
-		Color:       th.Color.DefaultTextWhiteColor,
-		Size:        unit.Sp(24),
-		Interactive: true,
+	richText := widgets.NewRichText(th).AddSpan([]richtext.SpanStyle{
+		{
+			Content:     "Hello ",
+			Color:       th.Color.DefaultTextWhiteColor,
+			Size:        unit.Sp(24),
+			Interactive: true,
+		},
 	}).OnClick(func(gtx layout.Context, content string) {
 		println("clicked")
 	}).OnHover(func(gtx layout.Context, content string) {

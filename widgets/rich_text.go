@@ -28,8 +28,18 @@ type RichText struct {
 	longPress actionFun
 }
 
-func (r *RichText) AddSpan(span richtext.SpanStyle) *RichText {
-	r.spans = append(r.spans, span)
+func (r *RichText) AddSpan(spans []richtext.SpanStyle) *RichText {
+	for key := range spans {
+		spans[key].Interactive = true
+	}
+	r.spans = append(r.spans, spans...)
+	return r
+}
+func (r *RichText) UpdateSpan(spans []richtext.SpanStyle) *RichText {
+	for key := range spans {
+		spans[key].Interactive = true
+	}
+	r.spans = spans
 	return r
 }
 
