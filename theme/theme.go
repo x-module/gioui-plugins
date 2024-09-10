@@ -78,6 +78,10 @@ type Color struct {
 
 	RadioSelectBgColor color.NRGBA
 
+	MenuBarBgColor      color.NRGBA
+	MenuBarBorderColor  color.NRGBA
+	MenuBarHoveredColor color.NRGBA
+
 	IconGrayColor            color.NRGBA
 	BorderBlueColor          color.NRGBA
 	BorderLightGrayColor     color.NRGBA
@@ -248,6 +252,10 @@ func (t *Theme) dark() *Theme {
 	t.Color.DefaultMaskBgColor = color.NRGBA{R: 10, G: 10, B: 12, A: 230}
 
 	t.Color.TableHeaderBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
+
+	t.Color.MenuBarBgColor = color.NRGBA{R: 39, G: 39, B: 42, A: 255}
+	t.Color.MenuBarBorderColor = color.NRGBA{R: 80, G: 80, B: 81, A: 255}
+	t.Color.MenuBarHoveredColor = color.NRGBA{R: 19, G: 87, B: 191, A: 255}
 
 	t.Color.IconGrayColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
 	t.Color.BorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
