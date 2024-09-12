@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -30,11 +31,13 @@ func main() {
 			Value: "exit",
 		},
 	}
-
-	menus := widgets.NewListMenu(th, "土豆", menuItemOptions)
-
+	menus := widgets.NewListMenu(th)
+	menus.SetLabel("土豆").SetOptions(menuItemOptions)
 	menus.SetLabelWidth(unit.Dp(50))
 	menus.SetMenuWidth(unit.Dp(100))
+	menus.Clicked(func(key int, menu string) {
+		fmt.Println(key, menu)
+	})
 	win := window.NewApplication(new(app.Window))
 	win.Title("Hello, Gio!").Size(window.ElementSize{
 		Height: 600,

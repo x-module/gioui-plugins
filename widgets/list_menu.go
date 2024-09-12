@@ -9,11 +9,9 @@
 package widgets
 
 import (
-	"fmt"
 	"gioui.org/f32"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
-	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/x/component"
@@ -22,9 +20,10 @@ import (
 )
 
 type ListMenu struct {
-	Label           string
+	theme *theme.Theme
+
+	label           string
 	optionsItems    []string
-	theme           *theme.Theme
 	menuContextArea component.ContextArea
 	menuState       component.MenuState
 	labelWidth      unit.Dp
@@ -32,9 +31,7 @@ type ListMenu struct {
 	clickFun        func(key int, menu string)
 	options         []*ListMenuOption
 	click           widget.Clickable
-	Show            bool
 	clickable       widget.Clickable
-	content         widget.Bool
 }
 
 type ListMenuOption struct {
@@ -46,22 +43,26 @@ type ListMenuOption struct {
 	IconColor color.NRGBA
 }
 
-func NewListMenu(th *theme.Theme, label string, options []*ListMenuOption) *ListMenu {
+func NewListMenu(th *theme.Theme) *ListMenu {
 	listMenu := &ListMenu{
 		theme:      th,
-		Label:      label,
 		labelWidth: unit.Dp(200),
-		options:    options,
 		menuContextArea: component.ContextArea{
 			Activation:       pointer.ButtonPrimary,
 			AbsolutePosition: true,
 		},
-		// menuState: component.MenuState{
-		//	OptionList: layout.List{Axis: layout.Vertical},
-		//	Options:    []func(gtx layout.Context) layout.Dimensions{},
-		// },
 	}
 	return listMenu
+}
+
+func (l *ListMenu) SetLabel(label string) *ListMenu {
+	l.label = label
+	return l
+}
+
+func (l *ListMenu) SetOptions(options []*ListMenuOption) *ListMenu {
+	l.options = options
+	return l
 }
 
 func (l *ListMenu) SetMenuWidth(width unit.Dp) {
@@ -77,30 +78,22 @@ func (l *ListMenu) Clicked(fun func(key int, menu string)) {
 func (l *ListMenu) Layout(gtx layout.Context) layout.Dimensions {
 	for i, opt := range l.options {
 		for opt.clickable.Clicked(gtx) {
-			fmt.Println("clicked,i:", i)
-			l.clickFun(i, opt.Value)
+			if l.clickFun != nil {
+				l.clickFun(i, opt.Value)
+			}
 		}
 	}
 	l.updateMenuItems()
-	return l.content.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return layout.Stack{}.Layout(gtx,
-			layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-				return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return l.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						l.Show = false
-						if l.content.Hovered() {
-							l.Show = true
-							gtx.Execute(op.InvalidateCmd{})
-						}
-						return Label(l.theme, l.Label).Layout(gtx)
-
-					})
+	return layout.Stack{}.Layout(gtx,
+		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return l.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return Label(l.theme, l.label).Layout(gtx)
 				})
-			}),
-			layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-				if !l.Show {
-					return layout.Dimensions{}
-				}
+			})
+		}),
+		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+			return l.menuContextArea.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Inset{
 						Top:  unit.Dp(30),
@@ -113,9 +106,9 @@ func (l *ListMenu) Layout(gtx layout.Context) layout.Dimensions {
 						return menu.Layout(gtx)
 					})
 				})
-			}),
-		)
-	})
+			})
+		}),
+	)
 }
 
 // updateMenuItems creates or updates menu items based on options and calculates minWidth.
