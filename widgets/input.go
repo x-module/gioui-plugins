@@ -29,6 +29,7 @@ const (
 	focused
 )
 
+type ActionFun func(gtx layout.Context)
 type Input struct {
 	theme *theme.Theme
 
@@ -49,10 +50,11 @@ type Input struct {
 	width       unit.Dp
 
 	showPassword bool
-	onIconClick  func()
 
-	onFocus     func()
-	onLostFocus func()
+	onIconClick ActionFun
+	onFocus     ActionFun
+	onLostFocus ActionFun
+	onChange    ActionFun
 }
 
 func NewInput(th *theme.Theme, hint string, text ...string) *Input {
@@ -87,11 +89,11 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	return t
 }
 
-func (i *Input) SetOnFocus(f func()) *Input {
+func (i *Input) SetOnFocus(f ActionFun) *Input {
 	i.onFocus = f
 	return i
 }
-func (i *Input) SetOnLostFocus(f func()) *Input {
+func (i *Input) SetOnLostFocus(f ActionFun) *Input {
 	i.onLostFocus = f
 	return i
 }
@@ -106,10 +108,15 @@ func (i *Input) SetWidth(width unit.Dp) *Input {
 	return i
 }
 
-func (i *Input) SetOnIconClick(f func()) *Input {
+func (i *Input) SetOnIconClick(f ActionFun) *Input {
 	i.onIconClick = f
 	return i
 }
+func (i *Input) SetonChanged(f ActionFun) *Input {
+	i.onChange = f
+	return i
+}
+
 func (i *Input) Password() *Input {
 	i.editor.Mask = '*'
 	i.icon, _ = widget.NewIcon(icons.ActionVisibilityOff)
@@ -155,11 +162,11 @@ func (i *Input) GetText() string {
 func (i *Input) update(gtx layout.Context, th *theme.Theme) {
 	if gtx.Focused(&i.editor) {
 		if i.onFocus != nil {
-			i.onFocus()
+			i.onFocus(gtx)
 		}
 	} else {
 		if i.onLostFocus != nil {
-			i.onLostFocus()
+			i.onLostFocus(gtx)
 		}
 	}
 	disabled := gtx.Source == (input.Source{})
@@ -204,6 +211,17 @@ func (i *Input) update(gtx layout.Context, th *theme.Theme) {
 		i.borderColor = i.theme.Color.InputFocusedBorderColor
 	case activated:
 		i.borderColor = i.theme.Color.InputActivatedBorderColor
+	}
+	for {
+		e, ok := i.editor.Update(gtx)
+		if !ok {
+			break
+		}
+		if _, ok := e.(widget.ChangeEvent); ok {
+			if i.onChange != nil {
+				i.onChange(gtx)
+			}
+		}
 	}
 }
 
@@ -274,7 +292,7 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 						iconLayout := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 							if i.iconClick.Clicked(gtx) {
 								if i.onIconClick != nil {
-									i.onIconClick()
+									i.onIconClick(gtx)
 								}
 								if !i.showPassword {
 									i.editor.Mask = 0

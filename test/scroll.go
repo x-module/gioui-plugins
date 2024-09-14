@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"gioui.org/app"
+	"gioui.org/io/clipboard"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/unit"
@@ -11,6 +13,8 @@ import (
 	"github.com/x-module/gioui-plugins/widgets"
 	"github.com/x-module/gioui-plugins/window"
 	"golang.org/x/exp/shiny/materialdesign/icons"
+	"io"
+	"strings"
 )
 
 var iconList = []string{
@@ -1937,50 +1941,81 @@ var iconMap = map[string][]byte{
 	"icons.ToggleStarBorder":                            icons.ToggleStarBorder,
 	"icons.ToggleStarHalf":                              icons.ToggleStarHalf,
 }
+var keyWords = "Edi"
+var elements []layout.Widget
+var th = theme.NewTheme()
+var scroll = widgets.NewScroll(th)
 
-func main() {
-	var clickable widget.Clickable
-
-	var th = theme.NewTheme()
-	card := widgets.NewCard(th)
-	win := window.NewApplication(new(app.Window))
-	var scroll = widgets.NewScroll(th)
-	var elements []layout.Widget
+func getElements() {
+	elements = []layout.Widget{}
 	for _, name := range iconList {
-		elements = append(elements, func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					return widgets.Label(th, name).Layout(gtx)
-				}),
-				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					return layout.Spacer{Width: unit.Dp(10)}.Layout(gtx)
-				}),
-				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					gtx.Constraints.Min.X = 100
-					icon, _ := widget.NewIcon(iconMap[name])
-					return icon.Layout(gtx, th.Color.WarningColor)
-				}),
-			)
-		})
+		if keyWords == "" || strings.Contains(strings.ToLower(name), strings.ToLower(keyWords)) {
+			// fmt.Println("keywords:", keyWords, "name:", name)
+			elements = append(elements, func(gtx layout.Context) layout.Dimensions {
+				clickMap[name].SetOnClick(func(gtx layout.Context) {
+					copyResponse(gtx, name)
+				})
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return widgets.Body1(th, name).Layout(gtx)
+					}),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return layout.Spacer{Width: unit.Dp(10)}.Layout(gtx)
+					}),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						gtx.Constraints.Min.X = 80
+						icon, _ := widget.NewIcon(iconMap[name])
+						return icon.Layout(gtx, th.Color.WarningColor)
+					}),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return clickMap[name].Layout(gtx)
+					}),
+				)
+			})
+		}
 	}
 	scroll.SetElementList(elements)
+}
+func copyResponse(gtx layout.Context, name string) {
+	gtx.Execute(clipboard.WriteCmd{
+		Data: io.NopCloser(strings.NewReader(name)),
+	})
+	// notify.Send(fmt.Sprintf("Copied to clipboard success"), 2*time.Second)
+}
+
+var clickMap = map[string]*widgets.IconButton{}
+
+func main() {
+
+	card := widgets.NewCard(th)
+	win := window.NewApplication(new(app.Window))
+
+	for _, name := range iconList {
+		clickMap[name] = widgets.NewIconButton(th, resource.CopyIcon)
+	}
 	win.Title("Hello, Gio!").Size(window.ElementSize{
 		Height: 600,
 		Width:  800,
 	})
+	filter := widgets.NewInput(th, "请输入搜索关键字...")
+	filter.SetonChanged(func(gtx layout.Context) {
+		fmt.Println("change:", filter.GetText())
+		keyWords = filter.GetText()
+	})
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
+		getElements()
 		layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						return scroll.Layout(gtx)
+						return filter.Layout(gtx)
 					})
 				}),
 				layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						return widgets.DefaultButton(th, &clickable, "default", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+						return scroll.Layout(gtx)
 					})
 				}),
 			)
