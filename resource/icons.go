@@ -80,11 +80,6 @@ var CloseIcon *widget.Icon = func() *widget.Icon {
 	return icon
 }()
 
-var ArrowDropDownIcon *widget.Icon = func() *widget.Icon {
-	icon, _ := widget.NewIcon(icons.NavigationArrowDropDown)
-	return icon
-}()
-
 var ForwardIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationChevronRight)
 	return icon
@@ -235,5 +230,14 @@ var ActionMinIcon *widget.Icon = func() *widget.Icon {
 }()
 var ActionFullIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ActionOpenWith)
+	return icon
+}()
+var ArrowDownIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.HardwareKeyboardArrowDown)
+	return icon
+}()
+
+var ArrowUpIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.HardwareKeyboardArrowUp)
 	return icon
 }()
