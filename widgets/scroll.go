@@ -36,17 +36,27 @@ func NewScroll(th *theme.Theme) *Scroll {
 	}
 	return p
 }
-func (n *Scroll) SetElementList(elementList []layout.Widget) {
-	n.elementList = elementList
+
+// Axis
+func (n *Scroll) SetAxis(axis layout.Axis) *Scroll {
+	n.list.Axis = axis
+	return n
 }
 
-func (n *Scroll) SetBgColor(color color.NRGBA) {
+func (n *Scroll) SetElementList(elementList []layout.Widget) *Scroll {
+	n.elementList = elementList
+	return n
+}
+
+func (n *Scroll) SetBgColor(color color.NRGBA) *Scroll {
 	n.bgColor = color
+	return n
 }
 
 // SetScrollToEnd 设置ScrollToEnd
-func (n *Scroll) SetScrollToEnd(scrollToEnd bool) {
+func (n *Scroll) SetScrollToEnd(scrollToEnd bool) *Scroll {
 	n.list.ScrollToEnd = scrollToEnd
+	return n
 }
 
 func (n *Scroll) Layout(gtx layout.Context) layout.Dimensions {

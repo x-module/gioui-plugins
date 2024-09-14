@@ -33,7 +33,7 @@ func main() {
 	age.SetSize(th.Size.Large)
 	age.ReadOnly()
 	password2.SetBefore(func(gtx layout.Context) layout.Dimensions {
-		return resource.ActionPermIdentityIcon.Layout(gtx, th.Color.IconGrayColor)
+		return resource.ActionPermIdentityIcon.Layout(gtx, th.Color.DefaultIconColor)
 	})
 	password2.Password()
 

@@ -305,7 +305,7 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 								}
 							}
 							return i.iconClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return i.icon.Layout(gtx, i.theme.Color.IconGrayColor)
+								return i.icon.Layout(gtx, i.theme.Color.DefaultIconColor)
 							})
 						})
 						widgets = append(widgets, iconLayout)

@@ -45,6 +45,7 @@ type Color struct {
 	DefaultBorderBlueColor    color.NRGBA
 	DefaultLineColor          color.NRGBA
 	DefaultMaskBgColor        color.NRGBA
+	DefaultIconColor          color.NRGBA
 
 	TableHeaderBgColor color.NRGBA
 
@@ -82,7 +83,6 @@ type Color struct {
 	MenuBarBorderColor  color.NRGBA
 	MenuBarHoveredColor color.NRGBA
 
-	IconGrayColor            color.NRGBA
 	BorderBlueColor          color.NRGBA
 	BorderLightGrayColor     color.NRGBA
 	HoveredBorderBlueColor   color.NRGBA
@@ -164,7 +164,7 @@ func (t *Theme) Material() *material.Theme {
 //		t.Color.DefaultLineColor = color.NRGBA{R: 44, G: 44, B: 47, A: 255}
 //		t.Color.DefaultMaskBgColor = color.NRGBA{R: 10, G: 10, B: 12, A: 230}
 //
-//		t.Color.IconGrayColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
+//		t.Color.DefaultIconColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
 //		t.Color.BorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
 //		t.Color.BorderLightGrayColor = color.NRGBA{R: 65, G: 65, B: 68, A: 255}
 //		t.Color.HoveredBorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
@@ -250,6 +250,7 @@ func (t *Theme) dark() *Theme {
 	t.Color.DefaultBorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
 	t.Color.DefaultLineColor = color.NRGBA{R: 43, G: 45, B: 49, A: 255}
 	t.Color.DefaultMaskBgColor = color.NRGBA{R: 10, G: 10, B: 12, A: 230}
+	t.Color.DefaultIconColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
 
 	t.Color.TableHeaderBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 
@@ -257,7 +258,6 @@ func (t *Theme) dark() *Theme {
 	t.Color.MenuBarBorderColor = color.NRGBA{R: 80, G: 80, B: 81, A: 255}
 	t.Color.MenuBarHoveredColor = color.NRGBA{R: 19, G: 87, B: 191, A: 255}
 
-	t.Color.IconGrayColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
 	t.Color.BorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
 	t.Color.BorderLightGrayColor = color.NRGBA{R: 65, G: 65, B: 68, A: 255}
 	t.Color.HoveredBorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}

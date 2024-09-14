@@ -113,14 +113,14 @@ func (b *FileSelector) updateIcon() {
 		b.input.SetAfter(func(gtx layout.Context) layout.Dimensions {
 			return b.actionClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints.Max.X = gtx.Dp(b.theme.Size.DefaultIconSize)
-				return resource.DeleteIcon.Layout(gtx, b.theme.Color.IconGrayColor)
+				return resource.DeleteIcon.Layout(gtx, b.theme.Color.DefaultIconColor)
 			})
 		})
 	} else {
 		b.input.SetAfter(func(gtx layout.Context) layout.Dimensions {
 			return b.actionClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints.Max.X = gtx.Dp(b.theme.Size.DefaultIconSize)
-				return resource.UploadIcon.Layout(gtx, b.theme.Color.IconGrayColor)
+				return resource.UploadIcon.Layout(gtx, b.theme.Color.DefaultIconColor)
 			})
 		})
 	}

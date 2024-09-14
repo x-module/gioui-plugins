@@ -24,7 +24,7 @@ func NewIconButton(th *theme.Theme, icon *widget.Icon) *IconButton {
 	return &IconButton{
 		theme:      th,
 		icon:       icon,
-		color:      th.Color.IconGrayColor,
+		color:      th.Color.DefaultIconColor,
 		colorHover: th.Color.GreenColor,
 		size:       th.Size.DefaultIconSize,
 		Clickable:  widget.Clickable{},
