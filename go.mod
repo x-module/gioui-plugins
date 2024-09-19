@@ -12,7 +12,7 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20240808152545-0cdaa3abc0fa
 )
 
-replace github.com/x-module/helper v0.0.5 => ../helper
+replace github.com/x-module/helper v0.0.5 => /Users/tudou/go/helper
 
 require (
 	fyne.io/systray v1.11.0 // indirect
@@ -43,6 +43,7 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
+	github.com/x-module/helper v0.0.5 // indirect
 	github.com/yuin/goldmark v1.7.1 // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect

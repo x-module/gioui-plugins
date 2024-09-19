@@ -44,7 +44,7 @@ func (t *Tree) SetWidth(width unit.Dp) *Tree {
 	return t
 }
 
-func (t *Tree) SetItems(nodes []*TreeNode) *Tree {
+func (t *Tree) SetNodes(nodes []*TreeNode) *Tree {
 	for _, node := range nodes {
 		t.setClick(node)
 	}
@@ -152,7 +152,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	items := []layout.FlexChild{
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return layout.Background{}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				//defer clip.Rect(image.Rectangle{Max: gtx.Constraints.Max}, gtx.Dp(t.theme.Size.DefaultElementRadiusSize)).Push(gtx.Ops).Pop()
+				// defer clip.Rect(image.Rectangle{Max: gtx.Constraints.Max}, gtx.Dp(t.theme.Size.DefaultElementRadiusSize)).Push(gtx.Ops).Pop()
 				if t.clickedNode == node {
 					bgColor = t.theme.Color.TreeClickedBgColor
 				}
@@ -183,9 +183,9 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 			}))
 		}
 		items = append(items, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			//return layout.Inset{}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			// return layout.Inset{}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx, dims...)
-			//})
+			// })
 		}))
 	}
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, items...)

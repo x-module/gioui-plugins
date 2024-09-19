@@ -134,6 +134,9 @@ type Color struct {
 	TreeIconColor      color.NRGBA
 	TreeHoveredBgColor color.NRGBA
 	TreeClickedBgColor color.NRGBA
+
+	MarkdownMarkColor    color.NRGBA
+	MarkdownDefaultColor color.NRGBA
 }
 
 type Theme struct {
@@ -343,6 +346,9 @@ func (t *Theme) dark() *Theme {
 	t.Color.TreeIconColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	t.Color.TreeHoveredBgColor = color.NRGBA{R: 59, G: 60, B: 61, A: 255}
 	t.Color.TreeClickedBgColor = color.NRGBA{R: 87, G: 87, B: 87, A: 255}
+
+	t.Color.MarkdownMarkColor = color.NRGBA{R: 255, G: 255, B: 0, A: 255}
+	t.Color.MarkdownDefaultColor = color.NRGBA{R: 223, G: 223, B: 224, A: 255}
 
 	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}

@@ -49,7 +49,7 @@ func main() {
 
 	var th = theme.NewTheme()
 	tree := widgets.NewTree(th)
-	tree.SetItems(rootNodes)
+	tree.SetNodes(rootNodes)
 	tree.OnClick(func(gtx layout.Context, node *widgets.TreeNode) {
 		fmt.Println("node:", node.Text, " clicked")
 	})

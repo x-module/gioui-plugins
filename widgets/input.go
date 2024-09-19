@@ -51,6 +51,8 @@ type Input struct {
 
 	showPassword bool
 
+	lineHeight unit.Sp
+
 	onIconClick ActionFun
 	onFocus     ActionFun
 	onLostFocus ActionFun
@@ -86,7 +88,14 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 		t.editor.SetText(text[0])
 	}
 	t.editor.SingleLine = false
+	t.editor.LineHeightScale = 1.5
 	return t
+}
+
+// lineHeight
+func (i *Input) SetLineHeight(height unit.Sp) *Input {
+	i.lineHeight = height
+	return i
 }
 
 func (i *Input) SetOnFocus(f ActionFun) *Input {
@@ -270,6 +279,9 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 						gtx.Constraints.Min.Y = gtx.Dp(i.size.Height) // 设置最小高度为 100dp
 						gtx.Constraints.Max.Y = gtx.Constraints.Min.Y // 限制最大高度与最小高度相同
 						editor.TextSize = i.size.TextSize
+
+						editor.LineHeight = i.lineHeight
+						editor.LineHeightScale = 1
 
 						if i.height > 0 {
 							gtx.Constraints.Min.Y = gtx.Dp(i.height)      // 设置最小高度为 100dp

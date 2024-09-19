@@ -109,7 +109,7 @@ func (w *Window) Layout(gtx layout.Context) layout.Dimensions {
 		}
 		w.isFullWindow = !w.isFullWindow
 	}
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return w.action.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -169,20 +169,21 @@ func (w *Window) Layout(gtx layout.Context) layout.Dimensions {
 							}),
 						}
 					}
+
 					return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 							gtx.Constraints.Min.X = gtx.Dp(unit.Dp(70))
 							return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, child...)
 						}),
-						layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-							if w.content != nil {
-								return w.content(gtx)
-							}
-							return layout.Dimensions{}
-						}),
 					)
 				})
 			})
+		}),
+		layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+			if w.content != nil {
+				return w.content(gtx)
+			}
+			return layout.Dimensions{}
 		}),
 	)
 }
