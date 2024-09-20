@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"gioui.org/font"
 	"gioui.org/layout"
+	text2 "gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -95,6 +96,13 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
 		}
+
+		label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
+		label.Alignment = text2.Middle
+		label.Color = m.th.Color.MarkdownDefaultColor
+		label.LineHeight = unit.Sp(30)
+		return label.Layout(gtx)
+
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
@@ -346,7 +354,9 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					return widget.Border{
 						Color: m.th.Color.BorderLightGrayColor,
 						Width: unit.Dp(1),
-					}.Layout(gtx, wd)
+					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
+					})
 				}))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -357,11 +367,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			for _, wd := range m.walk(n, 0, attr) {
 				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					gtx.Constraints.Min.X = 200
-					gtx.Constraints.Min.Y = 60
-					return widget.Border{
-						Color: m.th.Color.BorderLightGrayColor,
-						Width: unit.Dp(1),
-					}.Layout(gtx, wd)
+					return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
 				}))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -374,7 +380,9 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					return widget.Border{
 						Color: m.th.Color.BorderLightGrayColor,
 						Width: unit.Dp(1),
-					}.Layout(gtx, wd)
+					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
+					})
 				}))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
