@@ -13,14 +13,17 @@ import (
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/unit"
+	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/richtext"
 	"github.com/x-module/gioui-plugins/theme"
 	"github.com/x-module/helper/strutil"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/extension"
 	ast2 "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
 	"image/color"
 	"strings"
@@ -37,6 +40,8 @@ type Markdown struct {
 	source []byte
 
 	htmlTag []string
+
+	taskCheckBox []int // 0 非任务 1 未选中 2 选中
 }
 
 // NewMarkdown creates a new Markdown.
@@ -59,8 +64,13 @@ func (m *Markdown) deleteLine(gtx layout.Context, widget layout.Widget) layout.D
 // Render parses the Markdown content and converts it to a list of widgets.
 func (m *Markdown) Render(content []byte) []layout.Widget {
 	md := goldmark.New(
+		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			html.WithXHTML(),
 		),
 	)
 	m.source = content
@@ -69,7 +79,7 @@ func (m *Markdown) Render(content []byte) []layout.Widget {
 	m.fontStyle = font.Regular
 	m.fontColor = m.th.Color.MarkdownDefaultColor
 
-	return m.walk(document, 0)
+	return m.walk(document, 0, "entrance")
 }
 
 func (m *Markdown) filterContent(content string) string {
@@ -79,15 +89,12 @@ func (m *Markdown) filterContent(content string) string {
 }
 
 func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA) layout.Dimensions {
-	fmt.Println("tags:", m.htmlTag)
 	if _, ok := node.(*ast.Text); ok {
 		element, ok := node.(*ast.Text)
 		if !ok {
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
 		}
-		fmt.Println("===fontweight:", m.fontWeight*1)
-		fmt.Println("normal content:", string(element.Text(m.source)))
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
@@ -98,10 +105,6 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			},
 		}).Layout(gtx)
 		m.fontColor = m.th.Color.MarkdownDefaultColor
-		fmt.Println("------------------size--------------")
-		fmt.Println("size:", dims.Size)
-		fmt.Println("------------------size--------------")
-
 		return dims
 	} else if _, ok = node.(*ast.TextBlock); ok {
 		element, ok := node.(*ast.TextBlock)
@@ -109,8 +112,6 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
 		}
-		fmt.Println("===fontweight:", m.fontWeight*1)
-		fmt.Println("normal content:", string(element.Text(m.source)))
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
@@ -123,25 +124,19 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 		m.fontColor = m.th.Color.MarkdownDefaultColor
 		return dims
 	} else {
-		fmt.Println("----------------not text type-------------------------")
 		return layout.Dimensions{}
 	}
 
 }
 
 func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA) layout.Dimensions {
-	fmt.Println("-------------------------------------------------------------------")
-	fmt.Printf("all style:%s  lenght:%d \n", style, len(style))
 	if len(style) == 0 || style[0] == "" {
 		return m.normal(gtx, node, font, color)
 	} else {
 		currentStyle := style[0]
 		// 去掉第一个style后剩余的
 		otherStyle := style[1:]
-		fmt.Println("current style:", currentStyle)
-		fmt.Printf("other style:%s\n", otherStyle)
 		if currentStyle == StyleU { // 下划线
-			fmt.Println("下划线")
 			return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
 				return m.getStyleElement(gtx, otherStyle, node, font, color)
 			})
@@ -216,18 +211,17 @@ func getNumber(num int, level int) string {
 }
 
 // walk traverses the AST and converts it to a list of widgets.
-func (m *Markdown) walk(node ast.Node, level int) []layout.Widget {
+func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	var widgets []layout.Widget
+	fmt.Println("inter all attr:", attr)
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
-		fmt.Println("type:", child.Kind().String())
+		fmt.Println("inter type:", child.Kind().String(), " attr:", attr)
 		switch n := child.(type) {
 		case *ast.Text:
-			fmt.Println("text all tags:", m.htmlTag)
+			fmt.Println("text all attr:", attr)
 			htmlTags := make([]string, len(m.htmlTag))
 			copy(htmlTags, m.htmlTag)
-			fmt.Println("----------content:", string(n.Text(m.source)))
 			func(font font.Font, color color.NRGBA) {
-				fmt.Println("======exec=================")
 				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 					return m.getStyleElement(gtx, htmlTags, n, font, color)
 				})
@@ -238,10 +232,8 @@ func (m *Markdown) walk(node ast.Node, level int) []layout.Widget {
 			}, m.fontColor)
 			m.fontWeight = font.Normal
 			m.fontStyle = font.Regular
-			fmt.Println("-----------Text-------------")
 		case *ast.TextBlock:
-			widgets = append(widgets, m.walk(n, 0)...)
-			fmt.Println("-----------TextBlock-------------")
+			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
 			level := n.Level
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -262,62 +254,133 @@ func (m *Markdown) walk(node ast.Node, level int) []layout.Widget {
 			})
 		case *ast.Paragraph:
 			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, 0) {
+			for _, widget := range m.walk(n, 0, attr) {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
 			})
 		case *ast2.Strikethrough:
-			widgets = append(widgets, m.walk(n, 0)...)
+			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.List:
 			// widgets = m.walk(n)
 			index := 1
 			lv := level + 1
-			listWidgets := m.walk(n, lv)
-			for _, item := range listWidgets {
-				// index := i + 1
-				if n.IsOrdered() {
-					item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item)
-				} else {
-					item = m.decorateListItem("• ", item)
+			listWidgets := m.walk(n, lv, attr)
+			fmt.Println("------------list selected status:", m.taskCheckBox, " task count:", len(listWidgets))
+			if len(m.taskCheckBox) > 0 {
+				for key, item := range listWidgets {
+					status := 1
+					if key < len(m.taskCheckBox) {
+						status = m.taskCheckBox[key]
+					}
+					// index := i + 1
+					item = m.taskListItem(item, status == 2)
+					widgets = append(widgets, item)
+					index++
 				}
-				widgets = append(widgets, item)
-				index++
+			} else {
+				for _, item := range listWidgets {
+					// index := i + 1
+					if n.IsOrdered() {
+						item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item)
+					} else {
+						item = m.decorateListItem("• ", item)
+					}
+					widgets = append(widgets, item)
+					index++
+				}
 			}
 		case *ast.ListItem:
+			fmt.Println("-------attr:", attr)
 			// widgets = append(widgets, m.walk(n)...)
 			var childs []layout.FlexChild
 			lv := level + 1
-			for _, widget := range m.walk(n, lv) {
+			for _, widget := range m.walk(n, lv, attr) {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
 			})
 		case *ast.Emphasis:
-			fmt.Println("n.Level", n.Level)
 			if n.Level == 1 {
 				m.fontStyle = font.Italic
 			} else if n.Level == 2 {
 				m.fontWeight = font.Bold
-				fmt.Println("===fontweight--s:", m.fontWeight*1)
-
 			}
-			widgets = append(widgets, m.walk(n, 0)...)
+			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.HTMLBlock, *ast.RawHTML:
 			at := n.(*ast.RawHTML).Segments.At(0)
 			tag := string(at.Value(m.source))
-			fmt.Println("tag:", tag)
 			if strings.Contains(tag, "/") {
 				m.htmlTag = nil
 			} else {
 				m.htmlTag = append(m.htmlTag, tag)
 			}
+		case *ast2.TaskCheckBox:
+			fmt.Println("-------------------IsChecked:", n.IsChecked)
+			if n.IsChecked {
+				m.taskCheckBox = append(m.taskCheckBox, 2)
+			} else {
+				m.taskCheckBox = append(m.taskCheckBox, 1)
+			}
+			widgets = append(widgets, m.walk(n, 0, "Task")...)
+		case *ast.Image:
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return NewImage(m.th, string(n.Destination)).Layout(gtx)
+			})
+		case *ast2.Table:
+
+			var childs []layout.FlexChild
+			for _, widget := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(widget))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
+			})
+
+		case *ast2.TableHeader:
+			var childs []layout.FlexChild
+			for _, wd := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return widget.Border{
+						Color: m.th.Color.BorderLightGrayColor,
+						Width: unit.Dp(1),
+					}.Layout(gtx, wd)
+				}))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+			})
+		case *ast2.TableCell:
+			var childs []layout.FlexChild
+			for _, wd := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					gtx.Constraints.Min.X = 200
+					gtx.Constraints.Min.Y = 60
+					return widget.Border{
+						Color: m.th.Color.BorderLightGrayColor,
+						Width: unit.Dp(1),
+					}.Layout(gtx, wd)
+				}))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+			})
+		case *ast2.TableRow:
+			var childs []layout.FlexChild
+			for _, wd := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return widget.Border{
+						Color: m.th.Color.BorderLightGrayColor,
+						Width: unit.Dp(1),
+					}.Layout(gtx, wd)
+				}))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+			})
 		}
-		// if child.HasChildren() {
-		// 	widgets = append(widgets, r.walk(child, source)...)
-		// }
 	}
 	return widgets
 }
@@ -331,6 +394,19 @@ func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Wi
 				label.Color = m.th.Color.DefaultTextWhiteColor
 				label.TextSize = m.th.Size.MarkdownPointSize
 				return label.Layout(gtx)
+			}),
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				return item(gtx)
+			}),
+		)
+	}
+}
+func (m *Markdown) taskListItem(item layout.Widget, selected bool) layout.Widget {
+	return func(gtx layout.Context) layout.Dimensions {
+		return layout.Flex{}.Layout(gtx,
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				box := NewCheckBox(m.th, &widget.Bool{Value: selected}, "")
+				return box.Layout(gtx)
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return item(gtx)

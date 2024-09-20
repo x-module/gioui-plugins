@@ -81,6 +81,9 @@ func (c *Checkbox) Layout(gtx layout.Context) layout.Dimensions {
 				})
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				if c.Label == "" {
+					return layout.Dimensions{}
+				}
 				return layout.UniformInset(2).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					colMacro := op.Record(gtx.Ops)
 					paint.ColorOp{Color: c.Color}.Add(gtx.Ops)
