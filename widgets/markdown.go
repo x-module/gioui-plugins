@@ -9,6 +9,8 @@
 package widgets
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"gioui.org/font"
 	"gioui.org/layout"
@@ -17,6 +19,7 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/richtext"
+	"github.com/alecthomas/chroma/v2/quick"
 	"github.com/x-module/gioui-plugins/theme"
 	"github.com/x-module/helper/strutil"
 	"github.com/yuin/goldmark"
@@ -43,6 +46,8 @@ type Markdown struct {
 	htmlTag []string
 
 	taskCheckBox []int // 0 非任务 1 未选中 2 选中
+
+	textState richtext.InteractiveText
 }
 
 // NewMarkdown creates a new Markdown.
@@ -388,9 +393,55 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
 			})
+		case *ast.FencedCodeBlock:
+			//lang := string(n.Language(m.source))
+			var buf bytes.Buffer
+			for i := 0; i < n.Lines().Len(); i++ {
+				line := n.Lines().At(i)
+				buf.Write(line.Value(m.source))
+			}
+			caches := m.code(buf.String())
+			fmt.Println("caches:", len(caches))
+
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return NewCard(m.th).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
+				})
+			})
 		}
 	}
 	return widgets
+}
+
+func (m *Markdown) code(codeStr string) []richtext.SpanStyle {
+	var colorStr = `{"Background":{"R":248,"G":248,"B":242,"A":255},"Comment":{"R":117,"G":113,"B":94,"A":255},"CommentHashbang":{"R":117,"G":113,"B":94,"A":255},"CommentMultiline":{"R":117,"G":113,"B":94,"A":255},"CommentPreproc":{"R":117,"G":113,"B":94,"A":255},"CommentPreprocFile":{"R":117,"G":113,"B":94,"A":255},"CommentSingle":{"R":117,"G":113,"B":94,"A":255},"CommentSpecial":{"R":117,"G":113,"B":94,"A":255},"Error":{"R":150,"G":0,"B":80,"A":255},"GenericDeleted":{"R":249,"G":38,"B":113,"A":255},"GenericInserted":{"R":166,"G":226,"B":46,"A":255},"GenericSubheading":{"R":117,"G":113,"B":94,"A":255},"Keyword":{"R":102,"G":217,"B":239,"A":255},"KeywordConstant":{"R":102,"G":217,"B":239,"A":255},"KeywordDeclaration":{"R":102,"G":217,"B":239,"A":255},"KeywordNamespace":{"R":249,"G":38,"B":113,"A":255},"KeywordPseudo":{"R":102,"G":217,"B":239,"A":255},"KeywordReserved":{"R":102,"G":217,"B":239,"A":255},"KeywordType":{"R":102,"G":217,"B":239,"A":255},"LineHighlight":{"R":60,"G":60,"B":56,"A":255},"LineLink ":{"R":0,"G":0,"B":0,"A":255},"LineNumbers":{"R":127,"G":127,"B":127,"A":255},"LineNumbersTable":{"R":127,"G":127,"B":127,"A":255},"Literal":{"R":174,"G":129,"B":255,"A":255},"LiteralDate":{"R":230,"G":219,"B":116,"A":255},"LiteralNumber":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberBin":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberFloat":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberHex":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberInteger":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberIntegerLong":{"R":174,"G":129,"B":255,"A":255},"LiteralNumberOct":{"R":174,"G":129,"B":255,"A":255},"LiteralString":{"R":230,"G":219,"B":116,"A":255},"LiteralStringAffix":{"R":230,"G":219,"B":116,"A":255},"LiteralStringBacktick":{"R":230,"G":219,"B":116,"A":255},"LiteralStringChar":{"R":230,"G":219,"B":116,"A":255},"LiteralStringDelimiter":{"R":230,"G":219,"B":116,"A":255},"LiteralStringDoc":{"R":230,"G":219,"B":116,"A":255},"LiteralStringDouble":{"R":230,"G":219,"B":116,"A":255},"LiteralStringEscape":{"R":174,"G":129,"B":255,"A":255},"LiteralStringHeredoc":{"R":230,"G":219,"B":116,"A":255},"LiteralStringInterpol":{"R":230,"G":219,"B":116,"A":255},"LiteralStringOther":{"R":230,"G":219,"B":116,"A":255},"LiteralStringRegex":{"R":230,"G":219,"B":116,"A":255},"LiteralStringSingle":{"R":230,"G":219,"B":116,"A":255},"LiteralStringSymbol":{"R":230,"G":219,"B":116,"A":255},"NameAttribute":{"R":166,"G":226,"B":46,"A":255},"NameClass":{"R":166,"G":226,"B":46,"A":255},"NameConstant":{"R":102,"G":217,"B":239,"A":255},"NameDecorator":{"R":166,"G":226,"B":46,"A":255},"NameException":{"R":166,"G":226,"B":46,"A":255},"NameFunction":{"R":166,"G":226,"B":46,"A":255},"NameOther":{"R":166,"G":226,"B":46,"A":255},"NameTag":{"R":249,"G":38,"B":113,"A":255},"Operator":{"R":249,"G":38,"B":113,"A":255},"OperatorWord":{"R":249,"G":38,"B":113,"A":255},"PreWrapper":{"R":248,"G":248,"B":242,"A":255}}`
+	type Code struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	}
+	coloMap := make(map[string]color.NRGBA)
+	_ = json.Unmarshal([]byte(colorStr), &coloMap)
+	var cache []richtext.SpanStyle
+
+	var result bytes.Buffer
+	// 使用 Chroma 快速高亮显示代码，并将输出存储到变量 html 中
+	_ = quick.Highlight(&result, codeStr, "go", "json", "monokai")
+
+	var codes []Code
+	_ = json.Unmarshal(result.Bytes(), &codes)
+	th := theme.NewTheme()
+	for _, item := range codes {
+		color, ok := coloMap[item.Type]
+		if !ok {
+			color = th.Color.DefaultTextWhiteColor
+		}
+		cache = append(cache, richtext.SpanStyle{
+			Content: item.Value,
+			Size:    unit.Sp(15),
+			Color:   color,
+		})
+	}
+	return cache
 }
 
 // decorateListItem adds bullet points or numbers to list items.

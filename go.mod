@@ -12,7 +12,7 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20240808152545-0cdaa3abc0fa
 )
 
-replace github.com/x-module/helper v0.0.5 => /Users/tudou/go/helper
+replace github.com/x-module/helper v0.0.5 => /Users/lijin/go/helper
 
 require (
 	fyne.io/systray v1.11.0 // indirect
@@ -20,7 +20,9 @@ require (
 	gioui.org/shader v1.0.8 // indirect
 	git.wow.st/gmp/jni v0.0.0-20210610011705-34026c7e22d0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
+	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/fredbi/uri v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fyne-io/gl-js v0.0.0-20220119005834-d2da28d9ccfe // indirect
