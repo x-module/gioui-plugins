@@ -101,34 +101,34 @@ func (r *RichText) Layout(gtx layout.Context) layout.Dimensions {
 	return richtext.Text(&r.state, r.theme.Shaper, r.spans...).Layout(gtx)
 }
 
-func (t RichText) UnderLineLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
+func (r RichText) UnderLineLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	dims := widget(gtx)
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return widget(gtx)
 		}),
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return NewLine(t.theme).Color(t.theme.Color.MarkdownDefaultColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(dims.Size.X), 0)).Layout(gtx)
+			return NewLine(r.theme).Color(r.theme.Color.MarkdownDefaultColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(dims.Size.X), 0)).Layout(gtx)
 		}),
 	)
 }
-func (t RichText) DeleteLineLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
+func (r RichText) DeleteLineLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	dims := widget(gtx)
 	return layout.Stack{Alignment: layout.W}.Layout(gtx,
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return widget(gtx)
 		}),
 		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-			return NewLine(t.theme).Color(t.theme.Color.MarkdownDefaultColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(dims.Size.X), 0)).Layout(gtx)
+			return NewLine(r.theme).Color(r.theme.Color.MarkdownDefaultColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(dims.Size.X), 0)).Layout(gtx)
 		}),
 	)
 }
-func (t RichText) MarkLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
+func (r RichText) MarkLayout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	return layout.Background{}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		defer clip.Rect{
 			Max: gtx.Constraints.Min,
 		}.Push(gtx.Ops).Pop()
-		paint.Fill(gtx.Ops, t.theme.Color.GreenColor)
+		paint.Fill(gtx.Ops, r.theme.Color.GreenColor)
 		return layout.Dimensions{Size: gtx.Constraints.Min}
 	}, widget)
 }

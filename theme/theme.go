@@ -34,6 +34,8 @@ type Size struct {
 	DefaultIconSize          unit.Dp
 	DefaultElementRadiusSize unit.Dp
 	DefaultWidgetRadiusSize  unit.Dp
+
+	MarkdownPointSize unit.Sp
 }
 type Color struct {
 	DefaultWindowBgGrayColor  color.NRGBA
@@ -361,6 +363,8 @@ func (t *Theme) dark() *Theme {
 	t.Size.DefaultIconSize = unit.Dp(20)
 	t.Size.DefaultElementRadiusSize = unit.Dp(4)
 	t.Size.DefaultWidgetRadiusSize = unit.Dp(8)
+
+	t.Size.MarkdownPointSize = unit.Sp(14)
 
 	return t
 }

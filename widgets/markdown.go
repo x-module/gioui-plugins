@@ -98,6 +98,10 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			},
 		}).Layout(gtx)
 		m.fontColor = m.th.Color.MarkdownDefaultColor
+		fmt.Println("------------------size--------------")
+		fmt.Println("size:", dims.Size)
+		fmt.Println("------------------size--------------")
+
 		return dims
 	} else if _, ok = node.(*ast.TextBlock); ok {
 		element, ok := node.(*ast.TextBlock)
@@ -172,7 +176,7 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
 		fmt.Println("type:", child.Kind().String())
 		switch n := child.(type) {
-		case *ast.Text, *ast.TextBlock:
+		case *ast.Text:
 			fmt.Println("text all tags:", m.htmlTag)
 			htmlTags := make([]string, len(m.htmlTag))
 			copy(htmlTags, m.htmlTag)
@@ -190,11 +194,9 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 			m.fontWeight = font.Normal
 			m.fontStyle = font.Regular
 			fmt.Println("-----------Text-------------")
-		// case *ast.TextBlock:
-		// 	widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-		// 		return material.Body1(material.NewTheme(), string(n.Text(m.source))).Layout(gtx)
-		// 	})
-		// 	fmt.Println("-----------TextBlock-------------")
+		case *ast.TextBlock:
+			widgets = append(widgets, m.walk(n)...)
+			fmt.Println("-----------TextBlock-------------")
 		case *ast.Heading:
 			level := n.Level
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -227,17 +229,17 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 		case *ast2.Strikethrough:
 			widgets = append(widgets, m.walk(n)...)
 		case *ast.List:
-			widgets = m.walk(n)
-			// listWidgets := m.walk(n)
-			// for i, item := range listWidgets {
-			// 	index := i + 1
-			// 	if n.IsOrdered() {
-			// 		item = m.decorateListItem(fmt.Sprintf("%d. ", index), item)
-			// 	} else {
-			// 		item = m.decorateListItem("• ", item)
-			// 	}
-			// 	widgets = append(widgets, item)
-			// }
+			// widgets = m.walk(n)
+			listWidgets := m.walk(n)
+			for i, item := range listWidgets {
+				index := i + 1
+				if n.IsOrdered() {
+					item = m.decorateListItem(fmt.Sprintf("%d. ", index), item)
+				} else {
+					item = m.decorateListItem("• ", item)
+				}
+				widgets = append(widgets, item)
+			}
 		case *ast.ListItem:
 			widgets = append(widgets, m.walk(n)...)
 		case *ast.Emphasis:
@@ -269,14 +271,36 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 
 // decorateListItem adds bullet points or numbers to list items.
 func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Widget {
+
+	return func(gtx layout.Context) layout.Dimensions {
+		return layout.Flex{}.Layout(gtx,
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, prefix)
+				label.Color = m.th.Color.DefaultTextWhiteColor
+				label.TextSize = m.th.Size.MarkdownPointSize
+				return label.Layout(gtx)
+			}),
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				return item(gtx)
+			}),
+		)
+	}
+
 	return func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{
 			Axis: layout.Horizontal,
 		}.Layout(gtx,
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return material.Body1(material.NewTheme(), prefix).Layout(gtx)
+				body := material.Body1(material.NewTheme(), prefix)
+				body.Color = m.th.Color.MarkdownDefaultColor
+				return body.Layout(gtx)
 			}),
-			layout.Flexed(1, item),
+			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+				dims := item(gtx)
+				fmt.Println("dims:", dims.Size.X)
+				gtx.Constraints.Min.X = dims.Size.X
+				return dims
+			}),
 		)
 	}
 }
