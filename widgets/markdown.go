@@ -9,214 +9,43 @@
 package widgets
 
 import (
+	"fmt"
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/unit"
+	"gioui.org/widget/material"
+	"gioui.org/x/richtext"
 	"github.com/x-module/gioui-plugins/theme"
-	"golang.org/x/exp/slices"
+	"github.com/x-module/helper/strutil"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/ast"
+	ast2 "github.com/yuin/goldmark/extension/ast"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/text"
 	"image/color"
 	"strings"
 )
 
-type Element struct {
-	Type       string            `json:"type"`
-	Attributes map[string]string `json:"attributes"`
-	Content    string            `json:"content"`
-	Children   []Element         `json:"children"`
-}
-
+// Markdown renders the parsed Markdown to a list of widgets.
 type Markdown struct {
-	th       *theme.Theme
-	elements []Element
+	th         *theme.Theme
+	widgets    []layout.Widget
+	fontStyle  font.Style
+	fontWeight font.Weight
+	fontColor  color.NRGBA
 
-	weight font.Weight
-	style  font.Style
-	color  color.NRGBA
+	source []byte
+
+	htmlTag []string
 }
 
-// NewMarkdown creates a new Markdown widget.
-func NewMarkdown(th *theme.Theme) *Markdown {
+// NewMarkdown creates a new Markdown.
+func NewMarkdown(theme *theme.Theme) *Markdown {
 	return &Markdown{
-		th: th,
+		th: theme,
 	}
 }
 
-func (m *Markdown) SetElements(elements []Element) {
-	m.weight = font.Normal
-	m.style = font.Regular
-	m.color = m.th.Color.MarkdownDefaultColor
-	m.elements = elements
-}
-
-const (
-	Paragraph = "Paragraph"
-)
-
-func (m *Markdown) Layout(gtx layout.Context) layout.Dimensions {
-	var lineElement []layout.FlexChild
-	for _, elem := range m.elements {
-		// 	每个一行
-		if elem.Type == Paragraph { // 普通段落
-			lineElement = append(lineElement, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return m.paragraph(gtx, elem)
-			}))
-		}
-	}
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, lineElement...)
-}
-
-const (
-	StyleU     = "u"     // 下划线
-	StyleI     = "i"     // 斜体
-	StyleS     = "s"     // 删除线
-	StyleMark  = "mark"  // 高亮
-	StyleSmall = "small" // 小字体
-	StyleBig   = "big"   // 大字体
-	StyleBold  = "bold"  // 大字体
-)
-
-func (m *Markdown) parseTags(gtx layout.Context, tags string, child Element, son layout.Dimensions) layout.Dimensions {
-	tagList := strings.Split(tags, "@")
-	if len(tagList) == 0 {
-		return m.normal(gtx, child)
-	}
-	var commonTag []string
-	var specTag []string
-	sp := []string{"u", "s", "mark"}
-	for _, tag := range tagList {
-		if slices.Contains(sp, tag) {
-			specTag = append(specTag, tag)
-		} else {
-			commonTag = append(commonTag, tag)
-		}
-	}
-	commonTag = append(commonTag, specTag...)
-	for _, tag := range commonTag {
-		son = m.getTagText(gtx, tag, child, son)
-	}
-	return son
-}
-
-func (m *Markdown) getTagText(gtx layout.Context, style string, child Element, son layout.Dimensions) layout.Dimensions {
-	if len(child.Attributes) == 0 { // 普通文本
-		return m.normal(gtx, child)
-	} else if style == StyleU { // 下划线
-		return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
-			if strings.TrimSpace(child.Content) != "" {
-				return m.normal(gtx, child)
-			}
-			return son
-		})
-	} else if style == StyleS { // 删除线
-		return m.deleteLine(gtx, func(gtx layout.Context) layout.Dimensions {
-			if strings.TrimSpace(child.Content) != "" {
-				return m.normal(gtx, child)
-			} else {
-				return son
-			}
-		})
-	} else if style == StyleMark { // 高亮
-		m.color = m.th.Color.DefaultWindowBgGrayColor
-		return m.mark(gtx, func(gtx layout.Context) layout.Dimensions {
-			if strings.TrimSpace(child.Content) != "" {
-				return m.normal(gtx, child)
-			} else {
-				return son
-			}
-		})
-	} else if style == StyleI { // 斜体
-		return m.italic(gtx, child)
-	} else if style == StyleSmall { // 小字体
-		return m.small(gtx, child)
-	} else if style == StyleBig { // 大字体
-		return m.big(gtx, child)
-	} else if style == StyleBold { // 大字体
-		return m.bold(gtx, child)
-	} else { // 普通文本
-		return m.normal(gtx, child)
-	}
-}
-func (m *Markdown) paragraph(gtx layout.Context, element Element) layout.Dimensions {
-	var lineElement []layout.FlexChild
-	for _, child := range element.Children {
-		switch child.Type {
-		case "Text":
-			lineElement = append(lineElement, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return m.parseTags(gtx, child.Attributes["style"], child, layout.Dimensions{})
-			}))
-		case "Emphasis":
-			lineElement = append(lineElement, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return m.parseTags(gtx, child.Attributes["style"], child, layout.Dimensions{})
-			}))
-		}
-	}
-	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, lineElement...)
-}
-
-func (m *Markdown) normal(gtx layout.Context, element Element) layout.Dimensions {
-	if element.Content == "" {
-		return m.parseTags(gtx, element.Children[0].Attributes["style"], element.Children[0], layout.Dimensions{})
-	}
-	dims := NewRichText(m.th).AddSpan([]SpanStyle{
-		{
-			Content:     element.Content,
-			Color:       m.color,
-			Size:        unit.Sp(14),
-			Interactive: true,
-			Font: font.Font{
-				Typeface: "go",
-				Weight:   m.weight,
-				Style:    m.style,
-			},
-		},
-	}).Layout(gtx)
-	m.weight = font.Normal
-	m.style = font.Regular
-	m.color = m.th.Color.MarkdownDefaultColor
-	return dims
-}
-
-func (m *Markdown) small(gtx layout.Context, element Element) layout.Dimensions {
-	return NewRichText(m.th).AddSpan([]SpanStyle{
-		{
-			Content:     element.Content,
-			Color:       m.th.Color.DefaultTextWhiteColor,
-			Size:        unit.Sp(10),
-			Interactive: true,
-		},
-	}).Layout(gtx)
-}
-func (m *Markdown) big(gtx layout.Context, element Element) layout.Dimensions {
-	return NewRichText(m.th).AddSpan([]SpanStyle{
-		{
-			Content:     element.Content,
-			Color:       m.th.Color.DefaultTextWhiteColor,
-			Size:        unit.Sp(18),
-			Interactive: true,
-		},
-	}).Layout(gtx)
-}
-
-func (m *Markdown) italic(gtx layout.Context, element Element) layout.Dimensions {
-	return NewRichText(m.th).AddSpan([]SpanStyle{
-		{
-			Content:     element.Content,
-			Color:       m.th.Color.DefaultTextWhiteColor,
-			Size:        unit.Sp(14),
-			Interactive: true,
-			Font: font.Font{
-				Typeface: "go",
-				Weight:   font.Normal,
-				Style:    font.Italic,
-			},
-		},
-	}).Layout(gtx)
-}
-func (m *Markdown) bold(gtx layout.Context, element Element) layout.Dimensions {
-	m.weight = font.Bold
-	m.style = font.Regular
-	return m.paragraph(gtx, element)
-}
 func (m *Markdown) underLine(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	return NewRichText(m.th).UnderLineLayout(gtx, widget)
 }
@@ -225,4 +54,229 @@ func (m *Markdown) mark(gtx layout.Context, widget layout.Widget) layout.Dimensi
 }
 func (m *Markdown) deleteLine(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	return NewRichText(m.th).DeleteLineLayout(gtx, widget)
+}
+
+// Render parses the Markdown content and converts it to a list of widgets.
+func (m *Markdown) Render(content []byte) []layout.Widget {
+	md := goldmark.New(
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+	)
+	m.source = content
+	document := md.Parser().Parse(text.NewReader(content))
+	m.fontWeight = font.Normal
+	m.fontStyle = font.Regular
+	m.fontColor = m.th.Color.MarkdownDefaultColor
+
+	return m.walk(document)
+}
+
+func (m *Markdown) filterContent(content string) string {
+	return strutil.Replace(content, []string{
+		"~~",
+	}, []string{""})
+}
+
+func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+	fmt.Println("tags:", m.htmlTag)
+	if _, ok := node.(*ast.Text); ok {
+		element, ok := node.(*ast.Text)
+		if !ok {
+			fmt.Println("not text node!!")
+			return layout.Dimensions{}
+		}
+		fmt.Println("===fontweight:", m.fontWeight*1)
+		fmt.Println("normal content:", string(element.Text(m.source)))
+		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
+			{
+				Content:     string(element.Text(m.source)),
+				Size:        unit.Sp(14),
+				Interactive: true,
+				Color:       color,
+				Font:        font,
+			},
+		}).Layout(gtx)
+		m.fontColor = m.th.Color.MarkdownDefaultColor
+		return dims
+	} else if _, ok = node.(*ast.TextBlock); ok {
+		element, ok := node.(*ast.TextBlock)
+		if !ok {
+			fmt.Println("not text node!!")
+			return layout.Dimensions{}
+		}
+		fmt.Println("===fontweight:", m.fontWeight*1)
+		fmt.Println("normal content:", string(element.Text(m.source)))
+		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
+			{
+				Content:     string(element.Text(m.source)),
+				Size:        unit.Sp(14),
+				Interactive: true,
+				Color:       color,
+				Font:        font,
+			},
+		}).Layout(gtx)
+		m.fontColor = m.th.Color.MarkdownDefaultColor
+		return dims
+	} else {
+		fmt.Println("----------------not text type-------------------------")
+		return layout.Dimensions{}
+	}
+
+}
+
+func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+	fmt.Println("-------------------------------------------------------------------")
+	fmt.Printf("all style:%s  lenght:%d \n", style, len(style))
+	if len(style) == 0 || style[0] == "" {
+		return m.normal(gtx, node, font, color)
+	} else {
+		currentStyle := style[0]
+		// 去掉第一个style后剩余的
+		otherStyle := style[1:]
+		fmt.Println("current style:", currentStyle)
+		fmt.Printf("other style:%s\n", otherStyle)
+		if currentStyle == StyleU { // 下划线
+			fmt.Println("下划线")
+			return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
+			})
+		} else if currentStyle == StyleS { // 删除线
+			return m.deleteLine(gtx, func(gtx layout.Context) layout.Dimensions {
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
+			})
+		} else if currentStyle == StyleMark { // 高亮
+			color = m.th.Color.DefaultWindowBgGrayColor
+			return m.mark(gtx, func(gtx layout.Context) layout.Dimensions {
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
+			})
+		}
+		// else if currentStyle == StyleI { // 斜体
+		// 	return m.italic(gtx, child)
+		// } else if currentStyle == StyleSmall { // 小字体
+		// 	return m.small(gtx, child)
+		// } else if currentStyle == StyleBig { // 大字体
+		// 	return m.big(gtx, child)
+		// } else if currentStyle == StyleBold { // 大字体
+		// 	return m.bold(gtx, child)
+		// } else { // 普通文本
+		// 	return m.normal(gtx, child)
+		// }
+	}
+	return layout.Dimensions{}
+}
+
+// walk traverses the AST and converts it to a list of widgets.
+func (m *Markdown) walk(node ast.Node) []layout.Widget {
+	var widgets []layout.Widget
+	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
+		fmt.Println("type:", child.Kind().String())
+		switch n := child.(type) {
+		case *ast.Text, *ast.TextBlock:
+			fmt.Println("text all tags:", m.htmlTag)
+			htmlTags := make([]string, len(m.htmlTag))
+			copy(htmlTags, m.htmlTag)
+			fmt.Println("----------content:", string(n.Text(m.source)))
+			func(font font.Font, color color.NRGBA) {
+				fmt.Println("======exec=================")
+				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+					return m.getStyleElement(gtx, htmlTags, n, font, color)
+				})
+			}(font.Font{
+				Typeface: "go",
+				Weight:   m.fontWeight,
+				Style:    m.fontStyle,
+			}, m.fontColor)
+			m.fontWeight = font.Normal
+			m.fontStyle = font.Regular
+			fmt.Println("-----------Text-------------")
+		// case *ast.TextBlock:
+		// 	widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+		// 		return material.Body1(material.NewTheme(), string(n.Text(m.source))).Layout(gtx)
+		// 	})
+		// 	fmt.Println("-----------TextBlock-------------")
+		case *ast.Heading:
+			level := n.Level
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				heading := material.H1(material.NewTheme(), string(n.Text(m.source)))
+				switch level {
+				case 2:
+					heading = material.H2(material.NewTheme(), string(n.Text(m.source)))
+				case 3:
+					heading = material.H3(material.NewTheme(), string(n.Text(m.source)))
+				case 4:
+					heading = material.H4(material.NewTheme(), string(n.Text(m.source)))
+				case 5:
+					heading = material.H5(material.NewTheme(), string(n.Text(m.source)))
+				case 6:
+					heading = material.H6(material.NewTheme(), string(n.Text(m.source)))
+				}
+				return heading.Layout(gtx)
+			})
+		case *ast.Paragraph:
+			var childs []layout.FlexChild
+			for _, widget := range m.walk(n) {
+				childs = append(childs, layout.Rigid(widget))
+			}
+
+			aaa := func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+			}
+
+			widgets = append(widgets, aaa)
+		case *ast2.Strikethrough:
+			widgets = append(widgets, m.walk(n)...)
+		case *ast.List:
+			widgets = m.walk(n)
+			// listWidgets := m.walk(n)
+			// for i, item := range listWidgets {
+			// 	index := i + 1
+			// 	if n.IsOrdered() {
+			// 		item = m.decorateListItem(fmt.Sprintf("%d. ", index), item)
+			// 	} else {
+			// 		item = m.decorateListItem("• ", item)
+			// 	}
+			// 	widgets = append(widgets, item)
+			// }
+		case *ast.ListItem:
+			widgets = append(widgets, m.walk(n)...)
+		case *ast.Emphasis:
+			fmt.Println("n.Level", n.Level)
+			if n.Level == 1 {
+				m.fontStyle = font.Italic
+			} else if n.Level == 2 {
+				m.fontWeight = font.Bold
+				fmt.Println("===fontweight--s:", m.fontWeight*1)
+
+			}
+			widgets = append(widgets, m.walk(n)...)
+		case *ast.HTMLBlock, *ast.RawHTML:
+			at := n.(*ast.RawHTML).Segments.At(0)
+			tag := string(at.Value(m.source))
+			fmt.Println("tag:", tag)
+			if strings.Contains(tag, "/") {
+				m.htmlTag = nil
+			} else {
+				m.htmlTag = append(m.htmlTag, tag)
+			}
+		}
+		// if child.HasChildren() {
+		// 	widgets = append(widgets, r.walk(child, source)...)
+		// }
+	}
+	return widgets
+}
+
+// decorateListItem adds bullet points or numbers to list items.
+func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Widget {
+	return func(gtx layout.Context) layout.Dimensions {
+		return layout.Flex{
+			Axis: layout.Horizontal,
+		}.Layout(gtx,
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				return material.Body1(material.NewTheme(), prefix).Layout(gtx)
+			}),
+			layout.Flexed(1, item),
+		)
+	}
 }
