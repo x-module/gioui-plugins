@@ -69,7 +69,7 @@ func (m *Markdown) Render(content []byte) []layout.Widget {
 	m.fontStyle = font.Regular
 	m.fontColor = m.th.Color.MarkdownDefaultColor
 
-	return m.walk(document)
+	return m.walk(document, 0)
 }
 
 func (m *Markdown) filterContent(content string) string {
@@ -170,8 +170,53 @@ func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any,
 	return layout.Dimensions{}
 }
 
+func intToRoman(num int) string {
+	// Define Roman numerals for 1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000
+	values := []int{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1}
+	symbols := []string{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"}
+
+	// Initialize the result string
+	var result string
+
+	// Loop through each value-symbol pair
+	for i := 0; i < len(values); i++ {
+		// While num is greater than or equal to the value
+		for {
+			if num >= values[i] {
+				// Append the symbol to the result
+				result += symbols[i]
+				// Subtract the value from num
+				num -= values[i]
+			} else {
+				break
+			}
+		}
+	}
+
+	return result
+}
+func numToLetter(num int) string {
+	// 字母在 ASCII 表中的起始点是 'A' - 1，因为 1 应该对应 'A'
+	offset := 'a' - 1
+	// 计算给定数字对应的字母
+	letter := rune(num) + offset
+	// 将 rune 类型转换为 string 并返回
+	return string(letter)
+}
+
+func getNumber(num int, level int) string {
+	switch level {
+	case 1:
+		return fmt.Sprint(num)
+	case 3:
+		return intToRoman(num)
+	default:
+		return numToLetter(num)
+	}
+}
+
 // walk traverses the AST and converts it to a list of widgets.
-func (m *Markdown) walk(node ast.Node) []layout.Widget {
+func (m *Markdown) walk(node ast.Node, level int) []layout.Widget {
 	var widgets []layout.Widget
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
 		fmt.Println("type:", child.Kind().String())
@@ -195,7 +240,7 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 			m.fontStyle = font.Regular
 			fmt.Println("-----------Text-------------")
 		case *ast.TextBlock:
-			widgets = append(widgets, m.walk(n)...)
+			widgets = append(widgets, m.walk(n, 0)...)
 			fmt.Println("-----------TextBlock-------------")
 		case *ast.Heading:
 			level := n.Level
@@ -217,31 +262,39 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 			})
 		case *ast.Paragraph:
 			var childs []layout.FlexChild
-			for _, widget := range m.walk(n) {
+			for _, widget := range m.walk(n, 0) {
 				childs = append(childs, layout.Rigid(widget))
 			}
-
-			aaa := func(gtx layout.Context) layout.Dimensions {
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
-			}
-
-			widgets = append(widgets, aaa)
+			})
 		case *ast2.Strikethrough:
-			widgets = append(widgets, m.walk(n)...)
+			widgets = append(widgets, m.walk(n, 0)...)
 		case *ast.List:
 			// widgets = m.walk(n)
-			listWidgets := m.walk(n)
-			for i, item := range listWidgets {
-				index := i + 1
+			index := 1
+			lv := level + 1
+			listWidgets := m.walk(n, lv)
+			for _, item := range listWidgets {
+				// index := i + 1
 				if n.IsOrdered() {
-					item = m.decorateListItem(fmt.Sprintf("%d. ", index), item)
+					item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item)
 				} else {
 					item = m.decorateListItem("• ", item)
 				}
 				widgets = append(widgets, item)
+				index++
 			}
 		case *ast.ListItem:
-			widgets = append(widgets, m.walk(n)...)
+			// widgets = append(widgets, m.walk(n)...)
+			var childs []layout.FlexChild
+			lv := level + 1
+			for _, widget := range m.walk(n, lv) {
+				childs = append(childs, layout.Rigid(widget))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
+			})
 		case *ast.Emphasis:
 			fmt.Println("n.Level", n.Level)
 			if n.Level == 1 {
@@ -251,7 +304,7 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 				fmt.Println("===fontweight--s:", m.fontWeight*1)
 
 			}
-			widgets = append(widgets, m.walk(n)...)
+			widgets = append(widgets, m.walk(n, 0)...)
 		case *ast.HTMLBlock, *ast.RawHTML:
 			at := n.(*ast.RawHTML).Segments.At(0)
 			tag := string(at.Value(m.source))
@@ -271,7 +324,6 @@ func (m *Markdown) walk(node ast.Node) []layout.Widget {
 
 // decorateListItem adds bullet points or numbers to list items.
 func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Widget {
-
 	return func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{}.Layout(gtx,
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
@@ -282,24 +334,6 @@ func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Wi
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return item(gtx)
-			}),
-		)
-	}
-
-	return func(gtx layout.Context) layout.Dimensions {
-		return layout.Flex{
-			Axis: layout.Horizontal,
-		}.Layout(gtx,
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				body := material.Body1(material.NewTheme(), prefix)
-				body.Color = m.th.Color.MarkdownDefaultColor
-				return body.Layout(gtx)
-			}),
-			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-				dims := item(gtx)
-				fmt.Println("dims:", dims.Size.X)
-				gtx.Constraints.Min.X = dims.Size.X
-				return dims
 			}),
 		)
 	}
