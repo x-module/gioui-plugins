@@ -12,8 +12,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gioui.org/f32"
 	"gioui.org/font"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	text2 "gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -29,6 +31,7 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/text"
+	"image"
 	"image/color"
 	"strings"
 )
@@ -248,10 +251,13 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 		case *ast.TextBlock:
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
+			fmt.Println("header level:", n.Level)
 			level := n.Level
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				heading := material.H1(material.NewTheme(), string(n.Text(m.source)))
 				switch level {
+				case 1:
+					heading = material.H1(material.NewTheme(), string(n.Text(m.source)))
 				case 2:
 					heading = material.H2(material.NewTheme(), string(n.Text(m.source)))
 				case 3:
@@ -407,6 +413,38 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				return NewCard(m.th).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
 				})
+			})
+		case *ast.Blockquote: // 引用
+			var childs []layout.FlexChild
+			for _, wd := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(wd))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Stack{}.Layout(gtx,
+					layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+						rect := clip.UniformRRect(image.Rectangle{Max: image.Point{
+							X: gtx.Constraints.Max.X,
+							Y: gtx.Constraints.Min.Y,
+						}}, 0)
+						defer rect.Push(gtx.Ops).Pop()
+						return fill(gtx, m.th.Color.MarkdownBlockquoteBgColor)
+					}),
+					layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+						return layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+							dims := layout.Inset{Left: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+								return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+							})
+							return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+									return NewLine(m.th).Color(m.th.Color.GreenColor).Width(3).Line(gtx, f32.Pt(0, 0), f32.Pt(0, float32(dims.Size.Y))).Layout(gtx)
+								}),
+								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+									return dims
+								}),
+							)
+						})
+					}),
+				)
 			})
 		}
 	}
