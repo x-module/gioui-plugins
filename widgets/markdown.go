@@ -16,7 +16,6 @@ import (
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
-	text2 "gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -105,11 +104,12 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			return layout.Dimensions{}
 		}
 
-		label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
-		label.Alignment = text2.Middle
-		label.Color = m.th.Color.MarkdownDefaultColor
-		label.LineHeight = unit.Sp(30)
-		return label.Layout(gtx)
+		//table 专用的 ！！
+		//label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
+		//label.Alignment = text2.Start
+		//label.Color = m.th.Color.MarkdownDefaultColor
+		//label.LineHeight = unit.Sp(30)
+		//return label.Layout(gtx)
 
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
@@ -229,12 +229,9 @@ func getNumber(num int, level int) string {
 // walk traverses the AST and converts it to a list of widgets.
 func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	var widgets []layout.Widget
-	fmt.Println("inter all attr:", attr)
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
-		fmt.Println("inter type:", child.Kind().String(), " attr:", attr)
 		switch n := child.(type) {
 		case *ast.Text:
-			fmt.Println("text all attr:", attr)
 			htmlTags := make([]string, len(m.htmlTag))
 			copy(htmlTags, m.htmlTag)
 			func(font font.Font, color color.NRGBA) {
@@ -251,7 +248,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 		case *ast.TextBlock:
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
-			fmt.Println("header level:", n.Level)
 			level := n.Level
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				heading := material.H1(material.NewTheme(), string(n.Text(m.source)))
@@ -273,7 +269,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			})
 		case *ast.Paragraph:
 			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, 0, attr) {
+			for _, widget := range m.walk(n, level, attr) {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -286,7 +282,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			index := 1
 			lv := level + 1
 			listWidgets := m.walk(n, lv, attr)
-			fmt.Println("------------list selected status:", m.taskCheckBox, " task count:", len(listWidgets))
 			if len(m.taskCheckBox) > 0 {
 				for key, item := range listWidgets {
 					status := 1
@@ -311,7 +306,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				}
 			}
 		case *ast.ListItem:
-			fmt.Println("-------attr:", attr)
 			// widgets = append(widgets, m.walk(n)...)
 			var childs []layout.FlexChild
 			lv := level + 1
@@ -337,7 +331,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				m.htmlTag = append(m.htmlTag, tag)
 			}
 		case *ast2.TaskCheckBox:
-			fmt.Println("-------------------IsChecked:", n.IsChecked)
 			if n.IsChecked {
 				m.taskCheckBox = append(m.taskCheckBox, 2)
 			} else {
@@ -407,8 +400,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				buf.Write(line.Value(m.source))
 			}
 			caches := m.code(buf.String())
-			fmt.Println("caches:", len(caches))
-
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return NewCard(m.th).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
@@ -416,39 +407,64 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			})
 		case *ast.Blockquote: // 引用
 			var childs []layout.FlexChild
-			for _, wd := range m.walk(n, 0, attr) {
+			lv := level + 1
+			for _, wd := range m.walk(n, lv, attr) {
 				childs = append(childs, layout.Rigid(wd))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Stack{}.Layout(gtx,
-					layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-						rect := clip.UniformRRect(image.Rectangle{Max: image.Point{
-							X: gtx.Constraints.Max.X,
-							Y: gtx.Constraints.Min.Y,
-						}}, 0)
-						defer rect.Push(gtx.Ops).Pop()
-						return fill(gtx, m.th.Color.MarkdownBlockquoteBgColor)
-					}),
-					layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-						return layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-							dims := layout.Inset{Left: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+				return layout.Inset{Top: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return layout.Stack{Alignment: layout.NW}.Layout(gtx,
+						layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+							rect := clip.UniformRRect(image.Rectangle{Max: image.Point{
+								X: gtx.Constraints.Max.X,
+								Y: gtx.Constraints.Min.Y,
+							}}, 0)
+							defer rect.Push(gtx.Ops).Pop()
+							return fill(gtx, m.getBlockquoteBgColor(level))
+						}),
+						layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+							return layout.UniformInset(unit.Dp(0)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+								dims := layout.Inset{Left: unit.Dp(15), Top: unit.Dp(10), Bottom: unit.Dp(10), Right: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+									return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
+								})
+								return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+										return NewLine(m.th).Color(m.th.Color.GreenColor).Width(3).Line(gtx, f32.Pt(0, 0), f32.Pt(0, float32(dims.Size.Y))).Layout(gtx)
+									}),
+									layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+										return dims
+									}),
+								)
 							})
-							return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									return NewLine(m.th).Color(m.th.Color.GreenColor).Width(3).Line(gtx, f32.Pt(0, 0), f32.Pt(0, float32(dims.Size.Y))).Layout(gtx)
-								}),
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									return dims
-								}),
-							)
-						})
-					}),
-				)
+						}),
+					)
+				})
 			})
 		}
 	}
 	return widgets
+}
+
+func (m *Markdown) getBlockquoteBgColor(level int) color.NRGBA {
+	switch level {
+	case 0:
+		return m.th.Color.MarkdownBlockquoteBgColorL1
+	case 1:
+		return m.th.Color.MarkdownBlockquoteBgColorL2
+	case 2:
+		return m.th.Color.MarkdownBlockquoteBgColorL3
+	case 3:
+		return m.th.Color.MarkdownBlockquoteBgColorL4
+	case 4:
+		return m.th.Color.MarkdownBlockquoteBgColorL5
+	case 5:
+		return m.th.Color.MarkdownBlockquoteBgColorL6
+	case 6:
+		return m.th.Color.MarkdownBlockquoteBgColorL7
+	default:
+		fmt.Println("=========error default color get =============")
+		return m.th.Color.MarkdownBlockquoteBgColorL7
+	}
 }
 
 func (m *Markdown) code(codeStr string) []richtext.SpanStyle {

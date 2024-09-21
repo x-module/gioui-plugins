@@ -137,9 +137,15 @@ type Color struct {
 	TreeHoveredBgColor color.NRGBA
 	TreeClickedBgColor color.NRGBA
 
-	MarkdownMarkColor         color.NRGBA
-	MarkdownDefaultColor      color.NRGBA
-	MarkdownBlockquoteBgColor color.NRGBA
+	MarkdownMarkColor           color.NRGBA
+	MarkdownDefaultColor        color.NRGBA
+	MarkdownBlockquoteBgColorL1 color.NRGBA
+	MarkdownBlockquoteBgColorL2 color.NRGBA
+	MarkdownBlockquoteBgColorL3 color.NRGBA
+	MarkdownBlockquoteBgColorL4 color.NRGBA
+	MarkdownBlockquoteBgColorL5 color.NRGBA
+	MarkdownBlockquoteBgColorL6 color.NRGBA
+	MarkdownBlockquoteBgColorL7 color.NRGBA
 }
 
 type Theme struct {
@@ -352,7 +358,14 @@ func (t *Theme) dark() *Theme {
 
 	t.Color.MarkdownMarkColor = color.NRGBA{R: 255, G: 255, B: 0, A: 255}
 	t.Color.MarkdownDefaultColor = color.NRGBA{R: 223, G: 223, B: 224, A: 255}
-	t.Color.MarkdownBlockquoteBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
+
+	t.Color.MarkdownBlockquoteBgColorL1 = color.NRGBA{R: 48, G: 49, B: 53, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL2 = color.NRGBA{R: 64, G: 66, B: 70, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL3 = color.NRGBA{R: 78, G: 81, B: 86, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL4 = color.NRGBA{R: 91, G: 95, B: 100, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL5 = color.NRGBA{R: 103, G: 107, B: 113, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL6 = color.NRGBA{R: 113, G: 118, B: 124, A: 255}
+	t.Color.MarkdownBlockquoteBgColorL7 = color.NRGBA{R: 122, G: 128, B: 134, A: 255}
 
 	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
