@@ -43,6 +43,7 @@ type Color struct {
 	CardBgColor               color.NRGBA
 	DefaultBgGrayColor        color.NRGBA
 	DefaultTextWhiteColor     color.NRGBA
+	DefaultLinkColor          color.NRGBA
 	DefaultBorderGrayColor    color.NRGBA
 	DefaultBorderBlueColor    color.NRGBA
 	DefaultLineColor          color.NRGBA
@@ -262,6 +263,7 @@ func (t *Theme) dark() *Theme {
 
 	t.Color.DefaultBgGrayColor = color.NRGBA{R: 53, G: 54, B: 56, A: 255}
 	t.Color.DefaultTextWhiteColor = color.NRGBA{R: 223, G: 223, B: 224, A: 255}
+	t.Color.DefaultLinkColor = color.NRGBA{R: 107, G: 155, B: 250, A: 255}
 	t.Color.DefaultBorderGrayColor = color.NRGBA{R: 53, G: 54, B: 56, A: 255}
 	t.Color.DefaultBorderBlueColor = color.NRGBA{R: 127, G: 231, B: 196, A: 255}
 	t.Color.DefaultLineColor = color.NRGBA{R: 43, G: 45, B: 49, A: 255}

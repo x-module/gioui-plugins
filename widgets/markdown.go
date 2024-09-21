@@ -405,6 +405,26 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
 				})
 			})
+		case *ast.ThematicBreak: // 分割线
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Inset{Top: unit.Dp(15), Bottom: unit.Dp(15)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return NewLine(m.th).Color(m.th.Color.DefaultLineColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
+				})
+			})
+		case *ast.Link: // 分割线
+			// 获取链接目标 URL
+			url := string(n.Destination)
+			// 获取链接文本
+			var textContent bytes.Buffer
+			for child := n.FirstChild(); child != nil; child = child.NextSibling() {
+				if text, ok := child.(*ast.Text); ok {
+					textContent.Write(text.Segment.Value(m.source))
+				}
+			}
+			link := NewLink(m.th)
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return link.SetLink(textContent.String(), url).Layout(gtx)
+			})
 		case *ast.Blockquote: // 引用
 			var childs []layout.FlexChild
 			lv := level + 1
