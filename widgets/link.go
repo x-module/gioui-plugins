@@ -56,7 +56,6 @@ func (l *Link) Layout(gtx layout.Context) layout.Dimensions {
 		l.openBrowser(l.url)
 	}
 	dims := label.Layout(gtx)
-
 	return l.link.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		// 设置鼠标光标为小手
 		pointer.CursorPointer.Add(gtx.Ops)

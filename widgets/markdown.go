@@ -313,7 +313,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
 			})
 		case *ast.Emphasis:
 			if n.Level == 1 {
@@ -416,8 +416,8 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			url := string(n.Destination)
 			// 获取链接文本
 			var textContent bytes.Buffer
-			for child := n.FirstChild(); child != nil; child = child.NextSibling() {
-				if text, ok := child.(*ast.Text); ok {
+			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
+				if text, ok := item.(*ast.Text); ok {
 					textContent.Write(text.Segment.Value(m.source))
 				}
 			}
