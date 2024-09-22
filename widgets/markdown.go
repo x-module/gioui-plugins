@@ -16,6 +16,7 @@ import (
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
+	text2 "gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -96,21 +97,21 @@ func (m *Markdown) filterContent(content string) string {
 	}, []string{""})
 }
 
-func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA, attr string) layout.Dimensions {
 	if _, ok := node.(*ast.Text); ok {
 		element, ok := node.(*ast.Text)
 		if !ok {
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
 		}
-
 		//table 专用的 ！！
-		//label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
-		//label.Alignment = text2.Start
-		//label.Color = m.th.Color.MarkdownDefaultColor
-		//label.LineHeight = unit.Sp(30)
-		//return label.Layout(gtx)
-
+		if attr == "table" {
+			label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
+			label.Alignment = text2.Start
+			label.Color = m.th.Color.MarkdownDefaultColor
+			label.LineHeight = unit.Sp(30)
+			return label.Layout(gtx)
+		}
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
@@ -145,25 +146,25 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 
 }
 
-func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA, attr string) layout.Dimensions {
 	if len(style) == 0 || style[0] == "" {
-		return m.normal(gtx, node, font, color)
+		return m.normal(gtx, node, font, color, attr)
 	} else {
 		currentStyle := style[0]
 		// 去掉第一个style后剩余的
 		otherStyle := style[1:]
 		if currentStyle == StyleU { // 下划线
 			return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
 			})
 		} else if currentStyle == StyleS { // 删除线
 			return m.deleteLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
 			})
 		} else if currentStyle == StyleMark { // 高亮
 			color = m.th.Color.DefaultWindowBgGrayColor
 			return m.mark(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
 			})
 		}
 		// else if currentStyle == StyleI { // 斜体
@@ -236,7 +237,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			copy(htmlTags, m.htmlTag)
 			func(font font.Font, color color.NRGBA) {
 				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-					return m.getStyleElement(gtx, htmlTags, n, font, color)
+					return m.getStyleElement(gtx, htmlTags, n, font, color, attr)
 				})
 			}(font.Font{
 				Typeface: "go",
@@ -313,7 +314,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
 			})
 		case *ast.Emphasis:
 			if n.Level == 1 {
@@ -342,9 +343,8 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				return NewImage(m.th, string(n.Destination)).Layout(gtx)
 			})
 		case *ast2.Table:
-
 			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, 0, attr) {
+			for _, widget := range m.walk(n, 0, "table") {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
