@@ -50,7 +50,9 @@ type Markdown struct {
 
 	taskCheckBox []int // 0 非任务 1 未选中 2 选中
 
-	textState richtext.InteractiveText
+	textState    richtext.InteractiveText
+	tableHeaders []string
+	tableDatas   [][]any
 }
 
 // NewMarkdown creates a new Markdown.
@@ -104,7 +106,7 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
 		}
-		//table 专用的 ！！
+		// table 专用的 ！！
 		if attr == "table" {
 			label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
 			label.Alignment = text2.Start
@@ -230,6 +232,7 @@ func getNumber(num int, level int) string {
 // walk traverses the AST and converts it to a list of widgets.
 func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	var widgets []layout.Widget
+
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
 		switch n := child.(type) {
 		case *ast.Text:
@@ -343,57 +346,52 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				return NewImage(m.th, string(n.Destination)).Layout(gtx)
 			})
 		case *ast2.Table:
-			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, 0, "table") {
-				childs = append(childs, layout.Rigid(widget))
-			}
+			m.walk(n, 0, "table")
+			table := NewTable(m.th)
+			table.SetData(m.tableDatas)
+			table.SetHeader(m.tableHeaders)
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
+				return table.LayoutBorderTable(gtx)
 			})
-
 		case *ast2.TableHeader:
-			var childs []layout.FlexChild
-			for _, wd := range m.walk(n, 0, attr) {
-				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					return widget.Border{
-						Color: m.th.Color.BorderLightGrayColor,
-						Width: unit.Dp(1),
-					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
-					})
-				}))
+			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
+				for sitem := item.FirstChild(); sitem != nil; sitem = sitem.NextSibling() {
+					if element, ok := sitem.(*ast.Text); ok {
+						element.Text(m.source)
+						m.tableHeaders = append(m.tableHeaders, string(element.Text(m.source)))
+					} else {
+						fmt.Println("not text node!!", sitem.Kind().String())
+					}
+				}
 			}
-			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
-			})
+			// debug.DumpPrint(tableHeaders)
 		case *ast2.TableCell:
-			var childs []layout.FlexChild
-			for _, wd := range m.walk(n, 0, attr) {
-				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					gtx.Constraints.Min.X = 200
-					return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
-				}))
-			}
-			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
-			})
+			// var childs []layout.FlexChild
+			// for _, wd := range m.walk(n, 0, attr) {
+			// 	childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			// 		gtx.Constraints.Min.X = 200
+			// 		return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
+			// 	}))
+			// }
+			// widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+			// 	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
+			// })
 		case *ast2.TableRow:
-			var childs []layout.FlexChild
-			for _, wd := range m.walk(n, 0, attr) {
-				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					return widget.Border{
-						Color: m.th.Color.BorderLightGrayColor,
-						Width: unit.Dp(1),
-					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						return layout.UniformInset(unit.Dp(5)).Layout(gtx, wd)
-					})
-				}))
+			cellData := []any{}
+			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
+				for sitem := item.FirstChild(); sitem != nil; sitem = sitem.NextSibling() {
+					if element, ok := sitem.(*ast.Text); ok {
+						element.Text(m.source)
+						cellData = append(cellData, string(element.Text(m.source)))
+					} else {
+						fmt.Println("not text node!!", sitem.Kind().String())
+					}
+				}
 			}
-			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
-			})
+			m.tableDatas = append(m.tableDatas, cellData)
+
 		case *ast.FencedCodeBlock:
-			//lang := string(n.Language(m.source))
+			// lang := string(n.Language(m.source))
 			var buf bytes.Buffer
 			for i := 0; i < n.Lines().Len(); i++ {
 				line := n.Lines().At(i)

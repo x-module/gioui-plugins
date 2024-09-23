@@ -12,7 +12,7 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20240808152545-0cdaa3abc0fa
 )
 
-replace github.com/x-module/helper v0.0.5 => /Users/lijin/go/helper
+replace github.com/x-module/helper v0.0.5 => /Users/tudou/go/helper
 
 require (
 	fyne.io/systray v1.11.0 // indirect

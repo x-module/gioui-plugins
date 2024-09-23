@@ -19,22 +19,22 @@ func main() {
 		Width:  800,
 	})
 
-	grid := widgets.NewTable(th)
-	data := []map[string]any{
-		{"name": "one", "age": 1, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
-		{"name": "two", "age": 2, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
-		{"name": "three", "age": 3, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
-		{"name": "four", "age": 4, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
-		{"name": "five", "age": 5, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
-		{"name": "six", "age": 6, "class": 3, "birthDay": "2022-01-01", "address": "beijing"},
+	table := widgets.NewTable(th)
+	headers := []string{"Name", "Age", "Class", "BirthDay", "Address"}
+	data := [][]any{
+		{"Tom", 18, "Class 1", "2000-01-01", "Beijing"},
+		{"Jerry", 19, "Class 2", "2001-01-01", "Shanghai"},
+		{"Lucy", 20, "Class 3", "2002-01-01", "Guangzhou"},
+		{"Jack", 21, "Class 4", "2003-01-01", "Shenzhen"},
 	}
-	grid.SetData(data)
-	grid.SetHeader([]string{"Name", "Age", "Class", "BirthDay", "Address"})
+	table.SetData(data)
+	table.SetHeader(headers)
 
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
 		layout.UniformInset(unit.Dp(0)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return grid.LayoutTable(gtx)
+			// return table.LayoutHoverTable(gtx)
+			return table.LayoutBorderTable(gtx)
 		})
 	})
 	win.Run()
