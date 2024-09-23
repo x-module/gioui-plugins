@@ -219,6 +219,21 @@ func getNumber(num int, level int) string {
 		return numToLetter(num)
 	}
 }
+func getSign(level int) string {
+	fmt.Println("level:", level)
+	switch level {
+	case 1:
+		return "• "
+	case 3:
+		return "◦ "
+	case 5:
+		return "▪ "
+	case 7:
+		return "▫ "
+	default:
+		return "* "
+	}
+}
 
 // walk traverses the AST and converts it to a list of widgets.
 func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
@@ -232,7 +247,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
 		switch n := child.(type) {
 		case *ast.Text:
-			fmt.Println("text-level:", level)
+			//fmt.Println("text-level:", level)
 			fontSize := unit.Sp(14)
 			switch level {
 			case 101:
@@ -305,7 +320,8 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					if n.IsOrdered() {
 						item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item, lv)
 					} else {
-						item = m.decorateListItem("• ", item, lv)
+
+						item = m.decorateListItem(getSign(lv), item, lv)
 					}
 					widgets = append(widgets, item)
 					index++
@@ -316,9 +332,14 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			var childs []layout.FlexChild
 			lv := level + 1
 			for _, widget := range m.walk(n, lv, attr) {
-				childs = append(childs, layout.Rigid(widget))
+				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.UniformInset(unit.Dp(2)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return widget(gtx)
+					})
+				}))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+
 				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
 			})
 		case *ast.Emphasis:
