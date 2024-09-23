@@ -222,6 +222,11 @@ func getNumber(num int, level int) string {
 
 // walk traverses the AST and converts it to a list of widgets.
 func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("panic:", err)
+		}
+	}()
 	var widgets []layout.Widget
 
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
