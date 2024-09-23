@@ -16,7 +16,6 @@ import (
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
-	text2 "gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -99,20 +98,12 @@ func (m *Markdown) filterContent(content string) string {
 	}, []string{""})
 }
 
-func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA, attr string) layout.Dimensions {
+func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA) layout.Dimensions {
 	if _, ok := node.(*ast.Text); ok {
 		element, ok := node.(*ast.Text)
 		if !ok {
 			fmt.Println("not text node!!")
 			return layout.Dimensions{}
-		}
-		// table 专用的 ！！
-		if attr == "table" {
-			label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, string(element.Text(m.source)))
-			label.Alignment = text2.Start
-			label.Color = m.th.Color.MarkdownDefaultColor
-			label.LineHeight = unit.Sp(30)
-			return label.Layout(gtx)
 		}
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
@@ -148,25 +139,25 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 
 }
 
-func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA, attr string) layout.Dimensions {
+func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA) layout.Dimensions {
 	if len(style) == 0 || style[0] == "" {
-		return m.normal(gtx, node, font, color, attr)
+		return m.normal(gtx, node, font, color)
 	} else {
 		currentStyle := style[0]
 		// 去掉第一个style后剩余的
 		otherStyle := style[1:]
 		if currentStyle == StyleU { // 下划线
 			return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
 			})
 		} else if currentStyle == StyleS { // 删除线
 			return m.deleteLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
 			})
 		} else if currentStyle == StyleMark { // 高亮
 			color = m.th.Color.DefaultWindowBgGrayColor
 			return m.mark(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color, attr)
+				return m.getStyleElement(gtx, otherStyle, node, font, color)
 			})
 		}
 		// else if currentStyle == StyleI { // 斜体
@@ -240,7 +231,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			copy(htmlTags, m.htmlTag)
 			func(font font.Font, color color.NRGBA) {
 				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-					return m.getStyleElement(gtx, htmlTags, n, font, color, attr)
+					return m.getStyleElement(gtx, htmlTags, n, font, color)
 				})
 			}(font.Font{
 				Typeface: "go",
@@ -297,6 +288,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					widgets = append(widgets, item)
 					index++
 				}
+				m.taskCheckBox = nil
 			} else {
 				for _, item := range listWidgets {
 					// index := i + 1
