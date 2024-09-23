@@ -98,7 +98,7 @@ func (m *Markdown) filterContent(content string) string {
 	}, []string{""})
 }
 
-func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color color.NRGBA, fontSize unit.Sp) layout.Dimensions {
 	if _, ok := node.(*ast.Text); ok {
 		element, ok := node.(*ast.Text)
 		if !ok {
@@ -108,7 +108,7 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
-				Size:        unit.Sp(14),
+				Size:        fontSize,
 				Interactive: true,
 				Color:       color,
 				Font:        font,
@@ -125,7 +125,7 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 		dims := NewRichText(m.th).AddSpan([]richtext.SpanStyle{
 			{
 				Content:     string(element.Text(m.source)),
-				Size:        unit.Sp(14),
+				Size:        m.th.Size.DefaultTextSize,
 				Interactive: true,
 				Color:       color,
 				Font:        font,
@@ -139,25 +139,25 @@ func (m *Markdown) normal(gtx layout.Context, node any, font font.Font, color co
 
 }
 
-func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA) layout.Dimensions {
+func (m *Markdown) getStyleElement(gtx layout.Context, style []string, node any, font font.Font, color color.NRGBA, fontSize unit.Sp) layout.Dimensions {
 	if len(style) == 0 || style[0] == "" {
-		return m.normal(gtx, node, font, color)
+		return m.normal(gtx, node, font, color, fontSize)
 	} else {
 		currentStyle := style[0]
 		// 去掉第一个style后剩余的
 		otherStyle := style[1:]
 		if currentStyle == StyleU { // 下划线
 			return m.underLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, fontSize)
 			})
 		} else if currentStyle == StyleS { // 删除线
 			return m.deleteLine(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, fontSize)
 			})
 		} else if currentStyle == StyleMark { // 高亮
 			color = m.th.Color.DefaultWindowBgGrayColor
 			return m.mark(gtx, func(gtx layout.Context) layout.Dimensions {
-				return m.getStyleElement(gtx, otherStyle, node, font, color)
+				return m.getStyleElement(gtx, otherStyle, node, font, color, fontSize)
 			})
 		}
 		// else if currentStyle == StyleI { // 斜体
@@ -225,13 +225,29 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	var widgets []layout.Widget
 
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
+
 		switch n := child.(type) {
 		case *ast.Text:
+			fontSize := unit.Sp(14)
+			switch level {
+			case 1:
+				fontSize = unit.Sp(30)
+			case 2:
+				fontSize = unit.Sp(25)
+			case 3:
+				fontSize = unit.Sp(20)
+			case 4:
+				fontSize = unit.Sp(18)
+			case 5:
+				fontSize = unit.Sp(15)
+			case 6:
+				fontSize = unit.Sp(14)
+			}
 			htmlTags := make([]string, len(m.htmlTag))
 			copy(htmlTags, m.htmlTag)
 			func(font font.Font, color color.NRGBA) {
 				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-					return m.getStyleElement(gtx, htmlTags, n, font, color)
+					return m.getStyleElement(gtx, htmlTags, n, font, color, fontSize)
 				})
 			}(font.Font{
 				Typeface: "go",
@@ -243,25 +259,8 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 		case *ast.TextBlock:
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
-			level := n.Level
-			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				heading := material.H1(material.NewTheme(), string(n.Text(m.source)))
-				switch level {
-				case 1:
-					heading = material.H1(material.NewTheme(), string(n.Text(m.source)))
-				case 2:
-					heading = material.H2(material.NewTheme(), string(n.Text(m.source)))
-				case 3:
-					heading = material.H3(material.NewTheme(), string(n.Text(m.source)))
-				case 4:
-					heading = material.H4(material.NewTheme(), string(n.Text(m.source)))
-				case 5:
-					heading = material.H5(material.NewTheme(), string(n.Text(m.source)))
-				case 6:
-					heading = material.H6(material.NewTheme(), string(n.Text(m.source)))
-				}
-				return heading.Layout(gtx)
-			})
+			m.fontWeight = font.Bold
+			widgets = append(widgets, m.walk(n, n.Level, attr)...)
 		case *ast.Paragraph:
 			var childs []layout.FlexChild
 			for _, widget := range m.walk(n, level, attr) {
@@ -351,8 +350,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					if element, ok := sitem.(*ast.Text); ok {
 						element.Text(m.source)
 						m.tableHeaders = append(m.tableHeaders, string(element.Text(m.source)))
-					} else {
-						fmt.Println("not text node!!", sitem.Kind().String())
 					}
 				}
 			}
@@ -375,8 +372,6 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					if element, ok := sitem.(*ast.Text); ok {
 						element.Text(m.source)
 						cellData = append(cellData, string(element.Text(m.source)))
-					} else {
-						fmt.Println("not text node!!", sitem.Kind().String())
 					}
 				}
 			}
@@ -472,7 +467,6 @@ func (m *Markdown) getBlockquoteBgColor(level int) color.NRGBA {
 	case 6:
 		return m.th.Color.MarkdownBlockquoteBgColorL7
 	default:
-		fmt.Println("=========error default color get =============")
 		return m.th.Color.MarkdownBlockquoteBgColorL7
 	}
 }
