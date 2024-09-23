@@ -257,7 +257,13 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			m.fontWeight = font.Normal
 			m.fontStyle = font.Regular
 		case *ast.TextBlock:
-			widgets = append(widgets, m.walk(n, 0, attr)...)
+			var childs []layout.FlexChild
+			for _, widget := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(widget))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+			})
 		case *ast.Heading:
 			m.fontWeight = font.Bold
 			widgets = append(widgets, m.walk(n, n.Level+100, attr)...)
