@@ -225,22 +225,22 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	var widgets []layout.Widget
 
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
-
 		switch n := child.(type) {
 		case *ast.Text:
+			fmt.Println("text-level:", level)
 			fontSize := unit.Sp(14)
 			switch level {
-			case 1:
+			case 101:
 				fontSize = unit.Sp(30)
-			case 2:
+			case 102:
 				fontSize = unit.Sp(25)
-			case 3:
+			case 103:
 				fontSize = unit.Sp(20)
-			case 4:
+			case 104:
 				fontSize = unit.Sp(18)
-			case 5:
+			case 105:
 				fontSize = unit.Sp(15)
-			case 6:
+			case 106:
 				fontSize = unit.Sp(14)
 			}
 			htmlTags := make([]string, len(m.htmlTag))
@@ -260,10 +260,10 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
 			m.fontWeight = font.Bold
-			widgets = append(widgets, m.walk(n, n.Level, attr)...)
+			widgets = append(widgets, m.walk(n, n.Level+100, attr)...)
 		case *ast.Paragraph:
 			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, level, attr) {
+			for _, widget := range m.walk(n, 0, attr) {
 				childs = append(childs, layout.Rigid(widget))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
@@ -396,7 +396,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 					return NewLine(m.th).Color(m.th.Color.DefaultLineColor).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
 				})
 			})
-		case *ast.Link: // 分割线
+		case *ast.Link:
 			// 获取链接目标 URL
 			url := string(n.Destination)
 			// 获取链接文本
