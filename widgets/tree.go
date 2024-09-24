@@ -9,7 +9,9 @@
 package widgets
 
 import (
+	"fmt"
 	"gioui.org/layout"
+	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
@@ -48,8 +50,68 @@ func (t *Tree) SetNodes(nodes []*TreeNode) *Tree {
 	for _, node := range nodes {
 		t.setClick(node)
 	}
+	t.setPath(nodes, []int{})
 	t.nodes = nodes
 	return t
+}
+
+func (t *Tree) AddTopNode(newNode *TreeNode) error {
+	t.setClick(newNode)
+	t.nodes = append(t.nodes, newNode)
+	t.setPath(t.nodes, []int{})
+	return nil
+}
+
+func (t *Tree) AddSonNode(newNode *TreeNode) error {
+	if t.clickedNode == nil {
+		return fmt.Errorf("no node selected")
+	}
+	t.setClick(newNode)
+	path := t.clickedNode.Path
+	parentNode, err := t.getNode(t.nodes, path)
+	if err != nil {
+		return err
+	}
+	parentNode.Children = append(parentNode.Children, newNode)
+	t.setPath(t.nodes, []int{})
+	return nil
+}
+
+func (t *Tree) getNode(nodes []*TreeNode, paths []int) (*TreeNode, error) {
+	if nodes == nil {
+		nodes = t.nodes
+	}
+	for _, path := range paths {
+		if len(nodes) <= path {
+			return nil, fmt.Errorf("err path")
+		}
+		if len(paths) > 1 {
+			if nodes[path].Children != nil {
+				return t.getNode(nodes[path].Children, paths[1:])
+			}
+			return nil, fmt.Errorf("err path")
+		}
+		return nodes[path], nil
+	}
+	return nil, fmt.Errorf("err path")
+}
+
+func (t *Tree) setPath(nodes []*TreeNode, path []int) {
+	if nodes == nil {
+		nodes = t.nodes
+	}
+	for key, node := range nodes {
+		sign := []int{}
+		if len(path) == 0 {
+			sign = []int{key}
+		} else {
+			sign = append(path, key)
+		}
+		node.Path = sign
+		if len(node.Children) > 0 {
+			t.setPath(node.Children, sign)
+		}
+	}
 }
 
 func (t *Tree) setClick(nodes *TreeNode) {
@@ -71,6 +133,7 @@ type TreeNode struct {
 	selected      bool
 	clickable     *widget.Clickable
 	ClickCallback CallbackFun
+	Path          []int
 }
 
 func (t *Tree) Layout(gtx layout.Context) layout.Dimensions {
@@ -172,7 +235,6 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 			})
 		}),
 	}
-
 	// 递归渲染子节点
 	if node.expanded && len(node.Children) > 0 {
 		var dims []layout.FlexChild
@@ -189,4 +251,22 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 		}))
 	}
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, items...)
+}
+
+func (t *Tree) GetCurrentNode() *TreeNode {
+	return t.clickedNode
+}
+func (t *Tree) MinTree(gtx layout.Context, nodes []*TreeNode) {
+	if nodes == nil {
+		nodes = t.nodes
+	}
+	for _, node := range nodes {
+		if node.expanded {
+			node.expanded = false
+		}
+		if len(node.Children) > 0 {
+			t.MinTree(gtx, node.Children)
+		}
+	}
+	gtx.Execute(op.InvalidateCmd{})
 }
