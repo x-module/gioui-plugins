@@ -132,7 +132,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 				return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Inset{Top: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						gtx.Constraints.Max.X = gtx.Dp(t.theme.Size.DefaultIconSize)
-						return resource.ArrowUpIcon.Layout(gtx, t.theme.Color.TreeIconColor)
+						return resource.ArrowRightIcon.Layout(gtx, t.theme.Color.TreeIconColor)
 					})
 				})
 			}))

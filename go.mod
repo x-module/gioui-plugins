@@ -6,14 +6,16 @@ require (
 	fyne.io/fyne/v2 v2.5.1
 	gioui.org v0.7.1
 	gioui.org/x v0.7.1
+	github.com/alecthomas/chroma/v2 v2.14.0
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	github.com/x-module/helper v0.0.6
+	github.com/yuin/goldmark v1.7.1
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	golang.org/x/exp/shiny v0.0.0-20240808152545-0cdaa3abc0fa
 )
 
-//replace github.com/x-module/helper v0.0.5 => /Users/lijin/go/helper
+replace github.com/x-module/helper v0.0.5 => /Users/lijin/go/helper
 
 require (
 	fyne.io/systray v1.11.0 // indirect
@@ -21,7 +23,6 @@ require (
 	gioui.org/shader v1.0.8 // indirect
 	git.wow.st/gmp/jni v0.0.0-20210610011705-34026c7e22d0 // indirect
 	github.com/BurntSushi/toml v1.4.0 // indirect
-	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/fredbi/uri v1.1.0 // indirect
@@ -46,7 +47,6 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
-	github.com/yuin/goldmark v1.7.1 // indirect
 	golang.org/x/image v0.18.0 // indirect
 	golang.org/x/mobile v0.0.0-20231127183840-76ac6878050a // indirect
 	golang.org/x/net v0.25.0 // indirect

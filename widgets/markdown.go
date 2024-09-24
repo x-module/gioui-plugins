@@ -45,6 +45,8 @@ type Markdown struct {
 
 	source []byte
 
+	widgetList []layout.Widget
+
 	htmlTag []string
 
 	taskCheckBox []int // 0 非任务 1 未选中 2 选中
@@ -72,7 +74,7 @@ func (m *Markdown) deleteLine(gtx layout.Context, widget layout.Widget) layout.D
 }
 
 // Render parses the Markdown content and converts it to a list of widgets.
-func (m *Markdown) Render(content []byte) []layout.Widget {
+func (m *Markdown) Render(content []byte) *Markdown {
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithParserOptions(
@@ -88,8 +90,22 @@ func (m *Markdown) Render(content []byte) []layout.Widget {
 	m.fontWeight = font.Normal
 	m.fontStyle = font.Regular
 	m.fontColor = m.th.Color.MarkdownDefaultColor
+	m.widgetList = m.walk(document, 0, "entrance")
+	return m
+}
 
-	return m.walk(document, 0, "entrance")
+func (m *Markdown) Layout(gtx layout.Context) layout.Dimensions {
+	return layout.Flex{
+		Axis: layout.Vertical,
+	}.Layout(gtx, func() []layout.FlexChild {
+		children := make([]layout.FlexChild, len(m.widgetList))
+		for i, item := range m.widgetList {
+			children[i] = layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(5)}.Layout(gtx, item)
+			})
+		}
+		return children
+	}()...)
 }
 
 func (m *Markdown) filterContent(content string) string {
@@ -220,7 +236,6 @@ func getNumber(num int, level int) string {
 	}
 }
 func getSign(level int) string {
-	fmt.Println("level:", level)
 	switch level {
 	case 1:
 		return "• "
@@ -293,7 +308,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 						Content:     content,
 						Size:        fontSize,
 						Interactive: true,
-						Color:       m.th.Color.MarkdownDefaultColor,
+						Color:       m.th.Color.MarkdownHeaderColor,
 					},
 				}).Layout(gtx)
 			})

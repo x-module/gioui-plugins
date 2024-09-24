@@ -140,6 +140,7 @@ type Color struct {
 
 	MarkdownMarkColor           color.NRGBA
 	MarkdownDefaultColor        color.NRGBA
+	MarkdownHeaderColor         color.NRGBA
 	MarkdownBlockquoteBgColorL1 color.NRGBA
 	MarkdownBlockquoteBgColorL2 color.NRGBA
 	MarkdownBlockquoteBgColorL3 color.NRGBA
@@ -360,6 +361,7 @@ func (t *Theme) dark() *Theme {
 
 	t.Color.MarkdownMarkColor = color.NRGBA{R: 255, G: 255, B: 0, A: 255}
 	t.Color.MarkdownDefaultColor = color.NRGBA{R: 223, G: 223, B: 224, A: 255}
+	t.Color.MarkdownHeaderColor = color.NRGBA{R: 102, G: 204, B: 204, A: 255}
 
 	t.Color.MarkdownBlockquoteBgColorL1 = color.NRGBA{R: 48, G: 49, B: 53, A: 255}
 	t.Color.MarkdownBlockquoteBgColorL2 = color.NRGBA{R: 64, G: 66, B: 70, A: 255}

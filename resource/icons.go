@@ -241,3 +241,7 @@ var ArrowUpIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.HardwareKeyboardArrowUp)
 	return icon
 }()
+var ArrowRightIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.HardwareKeyboardArrowRight)
+	return icon
+}()
