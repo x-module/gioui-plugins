@@ -219,6 +219,21 @@ func getNumber(num int, level int) string {
 		return numToLetter(num)
 	}
 }
+func getSign(level int) string {
+	fmt.Println("level:", level)
+	switch level {
+	case 1:
+		return "• "
+	case 3:
+		return "◦ "
+	case 5:
+		return "▪ "
+	case 7:
+		return "▫ "
+	default:
+		return "* "
+	}
+}
 
 // walk traverses the AST and converts it to a list of widgets.
 func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
@@ -242,7 +257,13 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			m.fontWeight = font.Normal
 			m.fontStyle = font.Regular
 		case *ast.TextBlock:
-			widgets = append(widgets, m.walk(n, 0, attr)...)
+			var childs []layout.FlexChild
+			for _, widget := range m.walk(n, 0, attr) {
+				childs = append(childs, layout.Rigid(widget))
+			}
+			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+			})
 		case *ast.Heading:
 			m.fontWeight = font.Bold
 			content := ""
@@ -330,9 +351,10 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				for _, item := range listWidgets {
 					// index := i + 1
 					if n.IsOrdered() {
-						item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item)
+						item = m.decorateListItem(fmt.Sprintf("%s. ", getNumber(index, lv)), item, lv)
 					} else {
-						item = m.decorateListItem("• ", item)
+
+						item = m.decorateListItem(getSign(lv), item, lv)
 					}
 					widgets = append(widgets, item)
 					index++
@@ -343,7 +365,11 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			var childs []layout.FlexChild
 			lv := level + 1
 			for _, widget := range m.walk(n, lv, attr) {
-				childs = append(childs, layout.Rigid(widget))
+				childs = append(childs, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return layout.UniformInset(unit.Dp(2)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return widget(gtx)
+					})
+				}))
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, childs...)
@@ -543,19 +569,22 @@ func (m *Markdown) code(codeStr string) []richtext.SpanStyle {
 }
 
 // decorateListItem adds bullet points or numbers to list items.
-func (m *Markdown) decorateListItem(prefix string, item layout.Widget) layout.Widget {
+func (m *Markdown) decorateListItem(prefix string, item layout.Widget, lev int) layout.Widget {
+	leftPadding := unit.Dp(lev * 2)
 	return func(gtx layout.Context) layout.Dimensions {
-		return layout.Flex{}.Layout(gtx,
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, prefix)
-				label.Color = m.th.Color.DefaultTextWhiteColor
-				label.TextSize = m.th.Size.MarkdownPointSize
-				return label.Layout(gtx)
-			}),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return item(gtx)
-			}),
-		)
+		return layout.Inset{Left: leftPadding}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{}.Layout(gtx,
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					label := material.Label(m.th.Material(), m.th.Size.DefaultTextSize, prefix)
+					label.Color = m.th.Color.DefaultTextWhiteColor
+					label.TextSize = m.th.Size.MarkdownPointSize
+					return label.Layout(gtx)
+				}),
+				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					return item(gtx)
+				}),
+			)
+		})
 	}
 }
 func (m *Markdown) taskListItem(item layout.Widget, selected bool) layout.Widget {

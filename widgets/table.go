@@ -118,6 +118,11 @@ func (t *Table) LayoutHoverTable(gtx layout.Context) layout.Dimensions {
 }
 
 func (t *Table) LayoutBorderTable(gtx layout.Context) layout.Dimensions {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("panic:", err)
+		}
+	}()
 	return widget.Border{
 		Color: t.theme.Color.BorderLightGrayColor,
 		Width: unit.Dp(1),
