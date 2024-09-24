@@ -227,22 +227,7 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
 		switch n := child.(type) {
 		case *ast.Text:
-			fmt.Println("text-level:", level)
 			fontSize := unit.Sp(14)
-			switch level {
-			case 101:
-				fontSize = unit.Sp(30)
-			case 102:
-				fontSize = unit.Sp(25)
-			case 103:
-				fontSize = unit.Sp(20)
-			case 104:
-				fontSize = unit.Sp(18)
-			case 105:
-				fontSize = unit.Sp(15)
-			case 106:
-				fontSize = unit.Sp(14)
-			}
 			htmlTags := make([]string, len(m.htmlTag))
 			copy(htmlTags, m.htmlTag)
 			func(font font.Font, color color.NRGBA) {
@@ -260,15 +245,68 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.Heading:
 			m.fontWeight = font.Bold
-			widgets = append(widgets, m.walk(n, n.Level+100, attr)...)
-		case *ast.Paragraph:
-			var childs []layout.FlexChild
-			for _, widget := range m.walk(n, 0, attr) {
-				childs = append(childs, layout.Rigid(widget))
+			content := ""
+			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
+				if element, ok := item.(*ast.Text); ok {
+					content += string(element.Text(m.source))
+				}
+			}
+			fontSize := unit.Sp(14)
+			switch n.Level {
+			case 1:
+				fontSize = unit.Sp(30)
+			case 2:
+				fontSize = unit.Sp(25)
+			case 3:
+				fontSize = unit.Sp(20)
+			case 4:
+				fontSize = unit.Sp(18)
+			case 5:
+				fontSize = unit.Sp(15)
+			case 6:
+				fontSize = unit.Sp(14)
 			}
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+				return NewRichText(m.th).AddSpan([]richtext.SpanStyle{
+					{
+						Content:     content,
+						Size:        fontSize,
+						Interactive: true,
+						Color:       m.th.Color.MarkdownDefaultColor,
+					},
+				}).Layout(gtx)
 			})
+			// widgets = append(widgets, m.walk(n, n.Level+100, attr)...)
+		case *ast.Paragraph:
+			// 判断是否是内容描述，如何是则下面都是text类型节点
+			content := ""
+			describe := false
+			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
+				if element, ok := item.(*ast.Text); ok {
+					describe = true
+					content += string(element.Text(m.source))
+				}
+			}
+			if describe {
+				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+					return NewRichText(m.th).AddSpan([]richtext.SpanStyle{
+						{
+							Content:     content,
+							Size:        m.th.Size.DefaultTextSize,
+							Interactive: true,
+							Color:       m.th.Color.MarkdownDefaultColor,
+						},
+					}).Layout(gtx)
+				})
+			} else {
+				var childs []layout.FlexChild
+				for _, widget := range m.walk(n, 0, attr) {
+					childs = append(childs, layout.Rigid(widget))
+				}
+				widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
+					return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, childs...)
+				})
+			}
 		case *ast2.Strikethrough:
 			widgets = append(widgets, m.walk(n, 0, attr)...)
 		case *ast.List:
@@ -386,8 +424,10 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			}
 			caches := m.code(buf.String())
 			widgets = append(widgets, func(gtx layout.Context) layout.Dimensions {
-				return NewCard(m.th).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
+				return NewCard(m.th).SetPadding(0).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return layout.Inset{Top: unit.Dp(12), Left: unit.Dp(15)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return richtext.Text(&m.textState, m.th.Material().Shaper, caches...).Layout(gtx)
+					})
 				})
 			})
 		case *ast.ThematicBreak: // 分割线
