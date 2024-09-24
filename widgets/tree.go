@@ -142,7 +142,7 @@ func (t *Tree) Layout(gtx layout.Context) layout.Dimensions {
 			// 这里可以添加头部或者其他固定的内容
 			return layout.Dimensions{}
 		}),
-		layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx, t.renderTree(gtx, t.nodes)...)
 		}),
 	)

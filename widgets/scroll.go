@@ -62,8 +62,10 @@ func (n *Scroll) SetScrollToEnd(scrollToEnd bool) *Scroll {
 func (n *Scroll) Layout(gtx layout.Context) layout.Dimensions {
 	// gtx.Constraints.Min.X = gtx.Dp(unit.Dp(150))
 	// utils.ColorBackground(gtx, gtx.Constraints.Max, n.bgColor)
+	list := material.List(n.theme.Material(), n.list)
+	list.AnchorStrategy = material.Overlay
 	gtx.Constraints.Min.X = gtx.Constraints.Max.X
-	return material.List(n.theme.Material(), n.list).Layout(gtx, len(n.elementList), func(gtx layout.Context, index int) layout.Dimensions {
+	return list.Layout(gtx, len(n.elementList), func(gtx layout.Context, index int) layout.Dimensions {
 		return n.elementList[index](gtx)
 	})
 }
