@@ -180,7 +180,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	}
 	var sonItems []layout.FlexChild
 	// 绘制展开/折叠图标
-	if isParent && len(node.Children) > 0 {
+	if len(node.Children) > 0 {
 		if node.expanded {
 			sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -202,12 +202,10 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 		}
 	}
 	sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-		return layout.Inset{Left: unit.Dp(loop * 20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			gtx.Constraints.Min.X = gtx.Dp(t.width)
-			return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Inset{Top: unit.Dp(6)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return Label(t.theme, node.Text).Layout(gtx)
-				})
+		gtx.Constraints.Min.X = gtx.Dp(t.width)
+		return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(6)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return Label(t.theme, node.Text).Layout(gtx)
 			})
 		})
 	}))
@@ -230,7 +228,9 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 			}, func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(25))
 				return layout.Inset{Left: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, sonItems...)
+					return layout.Inset{Left: unit.Dp(loop * 20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, sonItems...)
+					})
 				})
 			})
 		}),
