@@ -23,7 +23,7 @@ func main() {
 	image := widgets.NewImage(th, "test/welcome.jpg")
 	win1 := new(app.Window)
 	win := window.NewApplication(win1)
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Width:  600,
 		Height: 400,
 	})
@@ -34,7 +34,7 @@ func main() {
 			select {
 			case <-time.After(time.Second * 1):
 				change = !change
-				win.Size(window.ElementSize{
+				win.Size(window.ElementStyle{
 					Width:  800,
 					Height: 500,
 				}).ReCenterWindow()
@@ -47,12 +47,12 @@ func main() {
 		if clickable.Clicked(gtx) {
 			fmt.Println("------click-----------")
 			if !change1 {
-				win.Size(window.ElementSize{
+				win.Size(window.ElementStyle{
 					Width:  1200,
 					Height: 900,
 				}).HaveActionBar().ReCenterWindow()
 			} else {
-				win.Size(window.ElementSize{
+				win.Size(window.ElementStyle{
 					Width:  1100,
 					Height: 800,
 				}).HaveActionBar().ReCenterWindow()

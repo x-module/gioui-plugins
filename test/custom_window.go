@@ -19,7 +19,7 @@ func main() {
 	var th = theme.NewTheme()
 	card := widgets.NewCard(th)
 	win := window.NewApplication(new(app.Window))
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})
@@ -50,7 +50,7 @@ func main() {
 	win.NoActionBar().CenterWindow()
 	win.Frame(func(gtx layout.Context, ops op.Ops, w *app.Window) {
 		if clickable.Clicked(gtx) {
-			win.Size(window.ElementSize{
+			win.Size(window.ElementStyle{
 				Width:  1200,
 				Height: 900,
 			}).ReCenterWindow()

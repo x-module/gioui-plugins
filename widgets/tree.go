@@ -126,7 +126,9 @@ func (t *Tree) setClick(nodes *TreeNode) {
 type CallbackFun func(gtx layout.Context)
 
 type TreeNode struct {
-	Text          string
+	Id            int
+	Title         string
+	ParentId      int
 	Icon          *widget.Icon
 	Children      []*TreeNode
 	expanded      bool
@@ -134,6 +136,7 @@ type TreeNode struct {
 	clickable     *widget.Clickable
 	ClickCallback CallbackFun
 	Path          []int
+	FilePath      string
 }
 
 func (t *Tree) Layout(gtx layout.Context) layout.Dimensions {
@@ -205,7 +208,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 		gtx.Constraints.Min.X = gtx.Dp(t.width)
 		return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return layout.Inset{Top: unit.Dp(6)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return Label(t.theme, node.Text).Layout(gtx)
+				return Label(t.theme, node.Title).Layout(gtx)
 			})
 		})
 	}))

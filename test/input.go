@@ -38,7 +38,7 @@ func main() {
 	password2.Password()
 
 	win := window.NewApplication(new(app.Window)).CenterWindow()
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

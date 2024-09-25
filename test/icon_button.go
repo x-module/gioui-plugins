@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -19,10 +18,10 @@ func main() {
 	card := widgets.NewCard(th)
 	iconClick := widgets.NewIconButton(th, resource.NavigationRefreshIcon)
 	iconClick.SetOnClick(func(gtx layout.Context) {
-		fmt.Println("icon clicked")
+		// fmt.Println("icon clicked")
 	})
 	win := window.NewApplication(new(app.Window))
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

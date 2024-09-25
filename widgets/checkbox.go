@@ -46,7 +46,7 @@ func NewCheckBox(th *theme.Theme, checkBox *widget.Bool, label string) Checkbox 
 }
 
 // SetSize 设置Size
-func (c *Checkbox) SetSize(size theme.ElementSize) {
+func (c *Checkbox) SetSize(size theme.ElementStyle) {
 	c.Size = size.IconSize
 	c.TextSize = size.TextSize
 }

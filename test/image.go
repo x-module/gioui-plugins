@@ -18,7 +18,7 @@ func main() {
 	card := widgets.NewCard(th)
 	image := widgets.NewImage(th, "test/welcome.jpg")
 	win := window.NewApplication(new(app.Window))
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

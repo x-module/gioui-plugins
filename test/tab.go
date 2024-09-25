@@ -43,7 +43,7 @@ func main() {
 
 	tabs.SetWidth(unit.Dp(400))
 	win := window.NewApplication(new(app.Window))
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

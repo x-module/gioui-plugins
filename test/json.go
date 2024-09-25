@@ -22,7 +22,7 @@ package main
 // 	var clickable widget.Clickable
 // 	th := theme.NewTheme()
 // 	win := window.NewApplication(new(app.Window))
-// 	win.Title("Hello, Gio!").Size(window.ElementSize{
+// 	win.Title("Hello, Gio!").Size(window.ElementStyle{
 // Height: 600,
 // Width:  800,
 // })

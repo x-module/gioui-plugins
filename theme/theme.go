@@ -15,18 +15,19 @@ import (
 	"image/color"
 )
 
-type ElementSize struct {
-	TextSize unit.Sp
-	Height   unit.Dp
-	Inset    layout.Inset
-	IconSize unit.Dp
+type ElementStyle struct {
+	TextSize  unit.Sp
+	Height    unit.Dp
+	Inset     layout.Inset
+	IconSize  unit.Dp
+	TextColor color.NRGBA
 }
 
 type Size struct {
-	Tiny   ElementSize
-	Small  ElementSize
-	Medium ElementSize
-	Large  ElementSize
+	Tiny   ElementStyle
+	Small  ElementStyle
+	Medium ElementStyle
+	Large  ElementStyle
 
 	DefaultElementWidth      unit.Dp
 	DefaultTextSize          unit.Sp
@@ -244,10 +245,10 @@ func (t *Theme) Material() *material.Theme {
 //		t.Color.JsonBoolColor = color.NRGBA{R: 161, G: 112, B: 88, A: 255}
 //		t.Color.JsonNullColor = color.NRGBA{R: 170, G: 118, B: 93, A: 255}
 //
-//		t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
-//		t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
-//		t.Size.Medium = ElementSize{TextSize: unit.Sp(14), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(24)}
-//		t.Size.Large = ElementSize{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
+//		t.Size.Tiny = ElementStyle{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
+//		t.Size.Small = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
+//		t.Size.Medium = ElementStyle{TextSize: unit.Sp(14), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(24)}
+//		t.Size.Large = ElementStyle{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
 //
 //		t.Size.DefaultElementWidth = unit.Dp(500)
 //		t.Size.DefaultTextSize = unit.Sp(14)
@@ -371,10 +372,10 @@ func (t *Theme) dark() *Theme {
 	t.Color.MarkdownBlockquoteBgColorL6 = color.NRGBA{R: 113, G: 118, B: 124, A: 255}
 	t.Color.MarkdownBlockquoteBgColorL7 = color.NRGBA{R: 122, G: 128, B: 134, A: 255}
 
-	t.Size.Tiny = ElementSize{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
-	t.Size.Small = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
-	t.Size.Medium = ElementSize{TextSize: unit.Sp(12), Height: unit.Dp(17), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(20)}
-	t.Size.Large = ElementSize{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
+	t.Size.Tiny = ElementStyle{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
+	t.Size.Small = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
+	t.Size.Medium = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(17), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(20)}
+	t.Size.Large = ElementStyle{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
 
 	t.Size.DefaultElementWidth = unit.Dp(500)
 	t.Size.DefaultTextSize = unit.Sp(12)

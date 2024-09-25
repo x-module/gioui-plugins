@@ -14,33 +14,33 @@ import (
 func main() {
 	rootNodes := []*widgets.TreeNode{
 		{
-			Text: "Root 1",
+			Title: "Root 1",
 			Children: []*widgets.TreeNode{
 				{
-					Text: "Child 1.1",
+					Title: "Child 1.1",
 					Children: []*widgets.TreeNode{
-						{Text: "Grandchild 1.1.1"},
-						{Text: "Grandchild 1.1.2"},
+						{Title: "Grandchild 1.1.1"},
+						{Title: "Grandchild 1.1.2"},
 					},
 					ClickCallback: func(gtx layout.Context) {
 						println("clicked")
 					},
 				},
 				{
-					Text: "Child 1.2",
+					Title: "Child 1.2",
 					Children: []*widgets.TreeNode{
-						{Text: "Grandchild 1.2.1"},
+						{Title: "Grandchild 1.2.1"},
 					},
 				},
 			},
 		},
 		{
-			Text: "Root 2",
+			Title: "Root 2",
 			Children: []*widgets.TreeNode{
 				{
-					Text: "Child 2.1",
+					Title: "Child 2.1",
 					Children: []*widgets.TreeNode{
-						{Text: "Grandchild 2.1.1"},
+						{Title: "Grandchild 2.1.1"},
 					},
 				},
 			},
@@ -51,12 +51,12 @@ func main() {
 	tree := widgets.NewTree(th)
 	tree.SetNodes(rootNodes)
 	tree.OnClick(func(gtx layout.Context, node *widgets.TreeNode) {
-		fmt.Println("node:", node.Text, " clicked")
+		fmt.Println("node:", node.Title, " clicked")
 	})
 	card := widgets.NewCard(th)
 	card.SetPadding(0).SetRadius(0)
 	win := window.NewApplication(new(app.Window)).CenterWindow()
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

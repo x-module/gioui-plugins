@@ -33,7 +33,7 @@ func NewRadioButton(th *theme.Theme, group *widget.Enum, key, label string) *Rad
 	return r
 }
 
-func (r *RadioButton) SetSize(size theme.ElementSize) {
+func (r *RadioButton) SetSize(size theme.ElementStyle) {
 	r.iconSize = size.IconSize
 	r.textSize = size.TextSize
 }

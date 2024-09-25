@@ -25,7 +25,7 @@ type (
 	FrameFun   func(gtx layout.Context, ops op.Ops, win *app.Window)
 )
 
-type ElementSize struct {
+type ElementStyle struct {
 	Width  int `yaml:"width"`
 	Height int `yaml:"height"`
 }
@@ -80,7 +80,7 @@ func (i *Application) Title(t string) *Application {
 	return i
 }
 
-func (i *Application) Size(size ElementSize) *Application {
+func (i *Application) Size(size ElementStyle) *Application {
 	i.options = append(i.options, app.Size(unit.Dp(size.Width), unit.Dp(size.Height)))
 	// i.options = append(i.options, app.MaxSize(unit.Dp(size.Width), unit.Dp(size.Height)))
 	// i.options = append(i.options, app.MinSize(unit.Dp(size.Width), unit.Dp(size.Height)))

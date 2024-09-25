@@ -46,7 +46,7 @@ type Input struct {
 	bgColor     color.NRGBA
 	hint        string
 	radius      unit.Dp
-	size        theme.ElementSize
+	size        theme.ElementStyle
 	width       unit.Dp
 
 	showPassword bool
@@ -74,6 +74,7 @@ func NewInput(th *theme.Theme, hint string, text ...string) *Input {
 	t.editor.SingleLine = true
 	return t
 }
+
 func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	t := &Input{
 		theme:  th,
@@ -156,7 +157,7 @@ func (i *Input) SetAfter(after layout.Widget) *Input {
 	return i
 }
 
-func (i *Input) SetSize(size theme.ElementSize) *Input {
+func (i *Input) SetSize(size theme.ElementStyle) *Input {
 	i.size = size
 	return i
 }
@@ -279,7 +280,7 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 						gtx.Constraints.Min.Y = gtx.Dp(i.size.Height) // 设置最小高度为 100dp
 						gtx.Constraints.Max.Y = gtx.Constraints.Min.Y // 限制最大高度与最小高度相同
 						editor.TextSize = i.size.TextSize
-
+						editor.Color = i.size.TextColor
 						editor.LineHeight = i.lineHeight
 						editor.LineHeightScale = 1
 

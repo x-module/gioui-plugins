@@ -21,7 +21,7 @@ func main() {
 	var visibilityAnimation component.VisibilityAnimation
 	var th = theme.NewTheme()
 	win := window.NewApplication(new(app.Window)).CenterWindow()
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})

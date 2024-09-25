@@ -24,7 +24,7 @@ func main() {
 	// dropDown.SetOptions(options)
 	dropDown.SetWidth(unit.Dp(300))
 	win := window.NewApplication(new(app.Window))
-	win.Title("Hello, Gio!").Size(window.ElementSize{
+	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,
 		Width:  800,
 	})
