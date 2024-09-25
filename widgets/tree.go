@@ -77,6 +77,20 @@ func (t *Tree) AddSonNode(newNode *TreeNode) error {
 	return nil
 }
 
+func (t *Tree) DeleteNode(newNode *TreeNode) error {
+	if t.clickedNode == nil {
+		return fmt.Errorf("no node selected")
+	}
+	t.setClick(newNode)
+	path := t.clickedNode.Path
+	parentNode, err := t.getNode(t.nodes, path)
+	if err != nil {
+		return err
+	}
+	parentNode.IsDeleted = true
+	return nil
+}
+
 func (t *Tree) getNode(nodes []*TreeNode, paths []int) (*TreeNode, error) {
 	if nodes == nil {
 		nodes = t.nodes
@@ -137,6 +151,7 @@ type TreeNode struct {
 	ClickCallback CallbackFun
 	Path          []int
 	FilePath      string
+	IsDeleted     bool
 }
 
 func (t *Tree) Layout(gtx layout.Context) layout.Dimensions {
@@ -157,6 +172,9 @@ func (t *Tree) renderTree(gtx layout.Context, nodes []*TreeNode) []layout.FlexCh
 	}
 	var dims []layout.FlexChild
 	for _, node := range nodes {
+		if node.IsDeleted {
+			continue
+		}
 		dims = append(dims, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return t.renderNode(gtx, node, 0, true)
 		}))
@@ -166,7 +184,7 @@ func (t *Tree) renderTree(gtx layout.Context, nodes []*TreeNode) []layout.FlexCh
 
 func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent bool) layout.Dimensions {
 	// 渲节点标题
-	bgColor := t.theme.Color.CardBgColor
+	bgColor := t.theme.Color.TreeBgColor
 
 	if node.clickable.Clicked(gtx) {
 		node.expanded = !node.expanded
@@ -242,6 +260,9 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	if node.expanded && len(node.Children) > 0 {
 		var dims []layout.FlexChild
 		for _, child := range node.Children {
+			if child.IsDeleted {
+				continue
+			}
 			dims = append(dims, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				level := loop + 1
 				return t.renderNode(gtx, child, level, false)

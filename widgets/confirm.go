@@ -90,9 +90,10 @@ func (c *Confirm) SetHeight(height int) *Confirm {
 	return c
 }
 
-func (c *Confirm) Message(message string) {
+func (c *Confirm) Message(message string) *Confirm {
 	c.message = message
 	c.visible = true
+	return c
 }
 func (c *Confirm) Close() {
 	c.visible = false
