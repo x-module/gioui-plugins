@@ -52,6 +52,7 @@ type Input struct {
 	showPassword bool
 
 	lineHeight unit.Sp
+	hasBorder  bool
 
 	onIconClick ActionFun
 	onFocus     ActionFun
@@ -61,8 +62,9 @@ type Input struct {
 
 func NewInput(th *theme.Theme, hint string, text ...string) *Input {
 	t := &Input{
-		theme:  th,
-		editor: widget.Editor{},
+		theme:     th,
+		editor:    widget.Editor{},
+		hasBorder: true,
 		// width:  th.Size.DefaultElementWidth,
 	}
 	t.size = th.Size.Medium
@@ -77,9 +79,10 @@ func NewInput(th *theme.Theme, hint string, text ...string) *Input {
 
 func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	t := &Input{
-		theme:  th,
-		editor: widget.Editor{},
-		height: unit.Dp(100),
+		theme:     th,
+		editor:    widget.Editor{},
+		height:    unit.Dp(100),
+		hasBorder: true,
 		// width:  th.Size.DefaultElementWidth,
 	}
 	t.size = th.Size.Medium
@@ -91,6 +94,12 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	t.editor.SingleLine = false
 	t.editor.LineHeightScale = 1.5
 	return t
+}
+
+// set hasBorder
+func (i *Input) SetHasBorder(hasBorder bool) *Input {
+	i.hasBorder = hasBorder
+	return i
 }
 
 // lineHeight
@@ -254,9 +263,13 @@ func (i *Input) Layout(gtx layout.Context) layout.Dimensions {
 }
 
 func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
+	borderWidth := unit.Dp(1)
+	if !i.hasBorder {
+		borderWidth = unit.Dp(0)
+	}
 	border := widget.Border{
 		Color:        i.borderColor,
-		Width:        unit.Dp(1),
+		Width:        borderWidth,
 		CornerRadius: i.radius,
 	}
 	return border.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -318,6 +331,7 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 								}
 							}
 							return i.iconClick.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+								gtx.Constraints.Max.X = gtx.Dp(i.size.IconSize)
 								return i.icon.Layout(gtx, i.theme.Color.DefaultIconColor)
 							})
 						})
