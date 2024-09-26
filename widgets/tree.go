@@ -37,6 +37,9 @@ func NewTree(th *theme.Theme) *Tree {
 	}
 }
 
+func (t *Tree) GetNodes() []*TreeNode {
+	return t.nodes
+}
 func (t *Tree) OnClick(fun ClickAction) *Tree {
 	t.click = fun
 	return t
