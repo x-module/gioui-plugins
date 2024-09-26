@@ -1,9 +1,11 @@
 package widgets
 
 import (
+	"fmt"
 	"gioui.org/font"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
+	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
@@ -13,6 +15,7 @@ import (
 	"github.com/x-module/gioui-plugins/theme"
 	"image"
 	"image/color"
+	"strings"
 )
 
 type SearchDropDown struct {
@@ -24,7 +27,6 @@ type SearchDropDown struct {
 
 	minWidth unit.Dp
 	width    unit.Dp
-	menuInit bool
 
 	isOpen              bool
 	selectedOptionIndex int
@@ -36,7 +38,7 @@ type SearchDropDown struct {
 	borderWidth  unit.Dp
 	cornerRadius unit.Dp
 
-	onValueChange func(value string)
+	onSelectedChange func(value string)
 
 	searchInput *Input
 }
@@ -50,7 +52,6 @@ type SearchDropDownOption struct {
 	Icon      *widget.Icon
 	IconColor color.NRGBA
 
-	isDivider bool
 	isDefault bool
 }
 
@@ -59,17 +60,10 @@ func (c *SearchDropDown) SetWidth(width unit.Dp) {
 	c.width = width
 }
 
-func NewSearchDropDownOption(text string) *SearchDropDownOption {
+func newSearchDropDownOption(text string) *SearchDropDownOption {
 	return &SearchDropDownOption{
-		Text:      text,
-		Value:     text,
-		isDivider: false,
-	}
-}
-
-func NewSearchDropDownDivider() *SearchDropDownOption {
-	return &SearchDropDownOption{
-		isDivider: true,
+		Text:  text,
+		Value: text,
 	}
 }
 
@@ -116,7 +110,7 @@ func (c *SearchDropDown) SetSelected(index int) {
 }
 
 func (c *SearchDropDown) SetOnChanged(f func(value string)) {
-	c.onValueChange = f
+	c.onSelectedChange = f
 }
 
 func (c *SearchDropDown) SetSelectedByTitle(title string) {
@@ -168,13 +162,12 @@ func NewSearchDropDown(th *theme.Theme, options ...string) *SearchDropDown {
 		borderWidth:  unit.Dp(1),
 		cornerRadius: unit.Dp(4),
 		theme:        th,
-		menuInit:     true,
 		// width:        th.Size.DefaultElementWidth,
 		searchInput: NewInput(th, "Search..."),
 	}
 	if len(options) > 0 {
 		for _, opt := range options {
-			c.options = append(c.options, NewSearchDropDownOption(opt))
+			c.options = append(c.options, newSearchDropDownOption(opt))
 		}
 	}
 	// c.searchInput.SetBefore(func(gtx layout.Context) layout.Dimensions {
@@ -201,13 +194,12 @@ func NewSearchDropDownWithoutBorder(th *theme.Theme, options ...string) *SearchD
 		borderWidth:  unit.Dp(0),
 		cornerRadius: unit.Dp(4),
 		theme:        th,
-		menuInit:     true,
 		// width:        th.Size.DefaultElementWidth,
 		searchInput: NewInput(th, "Search..."),
 	}
 	if len(options) > 0 {
 		for _, opt := range options {
-			c.options = append(c.options, NewSearchDropDownOption(opt))
+			c.options = append(c.options, newSearchDropDownOption(opt))
 		}
 	}
 	return c
@@ -220,16 +212,12 @@ func (c *SearchDropDown) SelectedIndex() int {
 func (c *SearchDropDown) SetOptions(options []*SearchDropDownOption) {
 	c.selectedOptionIndex = 0
 	c.options = options
-	if len(c.options) > 0 {
-		c.menuInit = true
-	}
 }
 
 func (c *SearchDropDown) GetSelected() *SearchDropDownOption {
 	if len(c.options) == 0 {
 		return nil
 	}
-
 	return c.options[c.selectedOptionIndex]
 }
 
@@ -285,8 +273,18 @@ func (c *SearchDropDown) SetMinWidth(minWidth unit.Dp) {
 	c.minWidth = minWidth
 }
 
+// update
+func (c *SearchDropDown) update(gtx layout.Context) {
+	c.searchInput.SetonChanged(func(gtx layout.Context) {
+		fmt.Println("current text:", c.searchInput.GetText())
+		c.updateMenuItems(c.searchInput.GetText())
+		gtx.Execute(op.InvalidateCmd{})
+	})
+}
+
 // Layout the SearchDropDown.
 func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensions {
+	c.update(gtx)
 	c.isOpen = c.menuContextArea.Active()
 
 	for i, opt := range c.options {
@@ -301,16 +299,10 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 	}
 
 	if c.selectedOptionIndex != c.lastSelectedIndex {
-		if c.onValueChange != nil {
-			go c.onValueChange(c.options[c.selectedOptionIndex].Value)
+		if c.onSelectedChange != nil {
+			c.onSelectedChange(c.options[c.selectedOptionIndex].Value)
 		}
 		c.lastSelectedIndex = c.selectedOptionIndex
-	}
-
-	// Update menu items only if options change
-	if c.menuInit {
-		c.menuInit = false
-		c.updateMenuItems(theme)
 	}
 
 	if c.minWidth == 0 {
@@ -329,6 +321,7 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 			return box
 		}),
 		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+
 			return c.menuContextArea.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				offset := layout.Inset{
 					Top:  unit.Dp(float32(box.Size.Y)/gtx.Metric.PxPerDp + 1),
@@ -339,9 +332,12 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 					if c.width != 0 {
 						gtx.Constraints.Max.X = gtx.Dp(c.width)
 					}
-					m := component.Menu(theme.Material(), &c.menu)
-					m.SurfaceStyle.Fill = c.theme.Color.DropDownBgGrayColor
-					return m.Layout(gtx)
+					if len(c.menu.Options) > 0 {
+						m := component.Menu(theme.Material(), &c.menu)
+						m.SurfaceStyle.Fill = c.theme.Color.DropDownBgGrayColor
+						return m.Layout(gtx)
+					}
+					return layout.Dimensions{}
 				})
 			})
 		}),
@@ -349,30 +345,24 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 }
 
 // updateMenuItems creates or updates menu items based on options and calculates minWidth.
-func (c *SearchDropDown) updateMenuItems(th *theme.Theme) {
+func (c *SearchDropDown) updateMenuItems(key string) {
 	c.menu.Options = c.menu.Options[:0]
 	for _, opt := range c.options {
-		opt := opt
+		if !strings.Contains(opt.Text, key) || key == "" {
+			continue
+		}
+		current := opt
 		c.menu.Options = append(c.menu.Options, func(gtx layout.Context) layout.Dimensions {
-			if opt.isDivider {
-				dv := component.Divider(th.Material())
-				dv.Fill = c.theme.Color.DefaultBorderGrayColor
-				dv.Layout(gtx)
-			}
-			itm := component.MenuItem(th.Material(), &opt.clickable, opt.Text)
+			itm := component.MenuItem(c.theme.Material(), &current.clickable, current.Text)
 			itm.HoverColor = c.theme.Color.DropDownItemHoveredGrayColor
-			if opt.Icon != nil {
-				itm.Icon = opt.Icon
-				itm.IconColor = opt.IconColor
+			if current.Icon != nil {
+				itm.Icon = current.Icon
+				itm.IconColor = current.IconColor
 			}
 			itm.Label.TextSize = c.theme.Size.DropdownTextSize
-			if c.GetSelected().Text == opt.Text {
+			if c.GetSelected().Text == current.Text {
 				itm.Label.Color = c.theme.Color.DropDownSelectedItemBgColor
 				itm.Label.Font.Weight = font.Bold
-				// itm.Icon = widgets.ActionStarRateIcon
-				// itm.IconSize = unit.Dp(16)
-				// itm.IconInset = outlay.Inset{}
-				// itm.IconColor = opt.IconColor
 			} else {
 				itm.Label.Color = c.theme.Color.DefaultTextWhiteColor
 			}

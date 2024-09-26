@@ -12,9 +12,9 @@ import (
 
 func main() {
 	th := theme.NewTheme()
-	dropDown := widgets.NewSearchDropDown(th, []string{"a", "b", "c", "d"}...)
+	dropDown := widgets.NewSearchDropDown(th, []string{"aaaaaa", "aab", "abc", "abcd"}...)
 	dropDown.SetOnChanged(func(value string) {
-		println(value)
+		println(dropDown.GetSelected())
 	})
 	dropDown.SetWidth(unit.Dp(300))
 	card := widgets.NewCard(th)
