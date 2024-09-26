@@ -145,12 +145,11 @@ type TreeNode struct {
 	ParentId      int
 	Icon          *widget.Icon
 	Children      []*TreeNode
-	expanded      bool
+	Expanded      bool
 	selected      bool
 	clickable     *widget.Clickable
 	ClickCallback CallbackFun
 	Path          []int
-	FilePath      string
 	IsDeleted     bool
 }
 
@@ -187,7 +186,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	bgColor := t.theme.Color.TreeBgColor
 
 	if node.clickable.Clicked(gtx) {
-		node.expanded = !node.expanded
+		node.Expanded = !node.Expanded
 		t.clickedNode = node
 		if node.ClickCallback != nil {
 			node.ClickCallback(gtx)
@@ -202,7 +201,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	var sonItems []layout.FlexChild
 	// 绘制展开/折叠图标
 	if len(node.Children) > 0 {
-		if node.expanded {
+		if node.Expanded {
 			sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return node.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Inset{Top: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -257,7 +256,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 		}),
 	}
 	// 递归渲染子节点
-	if node.expanded && len(node.Children) > 0 {
+	if node.Expanded && len(node.Children) > 0 {
 		var dims []layout.FlexChild
 		for _, child := range node.Children {
 			if child.IsDeleted {
@@ -277,6 +276,9 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, items...)
 }
 
+func (t *Tree) SetCurrentNode(node *TreeNode) {
+	t.clickedNode = node
+}
 func (t *Tree) GetCurrentNode() *TreeNode {
 	return t.clickedNode
 }
@@ -285,8 +287,8 @@ func (t *Tree) MinTree(gtx layout.Context, nodes []*TreeNode) {
 		nodes = t.nodes
 	}
 	for _, node := range nodes {
-		if node.expanded {
-			node.expanded = false
+		if node.Expanded {
+			node.Expanded = false
 		}
 		if len(node.Children) > 0 {
 			t.MinTree(gtx, node.Children)
