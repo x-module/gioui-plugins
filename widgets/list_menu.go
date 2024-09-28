@@ -15,6 +15,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/x/component"
+	"gioui.org/x/outlay"
 	"github.com/x-module/gioui-plugins/theme"
 	"image/color"
 )
@@ -153,8 +154,21 @@ func (l *ListMenu) updateMenuItems() {
 						itm.Icon = currentOpt.Icon
 						itm.IconColor = currentOpt.IconColor
 					}
+					itm.IconSize = l.theme.Size.DefaultIconSize
 					itm.Label.TextSize = l.theme.Size.DefaultTextSize
 					itm.Label.Color = l.theme.Color.DropdownTextColor
+					itm.IconInset = outlay.Inset{
+						Top:    unit.Dp(5),
+						Bottom: unit.Dp(5),
+						Start:  unit.Dp(5),
+						// End:    unit.Dp(5),
+					}
+					itm.LabelInset = outlay.Inset{
+						Top:    unit.Dp(5),
+						Bottom: unit.Dp(5),
+						Start:  unit.Dp(5),
+						// End:    unit.Dp(5),
+					}
 					return itm.Layout(gtx)
 				}),
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {

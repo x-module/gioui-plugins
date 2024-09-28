@@ -258,3 +258,11 @@ var ExportImageIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ImageCollections)
 	return icon
 }()
+var FullScreenIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.NavigationFullscreen)
+	return icon
+}()
+var FullScreenExitIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.NavigationFullscreenExit)
+	return icon
+}()
