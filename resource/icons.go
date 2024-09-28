@@ -245,3 +245,16 @@ var ArrowRightIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.HardwareKeyboardArrowRight)
 	return icon
 }()
+
+var ExportMarkdownIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ImageCollectionsBookmark)
+	return icon
+}()
+var ExportPdfIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ImagePictureAsPDF)
+	return icon
+}()
+var ExportImageIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ImageCollections)
+	return icon
+}()

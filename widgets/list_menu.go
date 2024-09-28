@@ -22,16 +22,18 @@ import (
 type ListMenu struct {
 	theme *theme.Theme
 
-	label           string
-	optionsItems    []string
-	menuContextArea component.ContextArea
-	menuState       component.MenuState
-	labelWidth      unit.Dp
-	menuWidth       unit.Dp
-	clickFun        func(key int, menu string)
-	options         []*ListMenuOption
-	click           widget.Clickable
-	clickable       widget.Clickable
+	label            string
+	optionsItems     []string
+	menuContextArea  component.ContextArea
+	menuState        component.MenuState
+	labelWidth       unit.Dp
+	menuWidth        unit.Dp
+	clickFun         func(key int, menu string)
+	options          []*ListMenuOption
+	click            widget.Clickable
+	clickable        widget.Clickable
+	icon             *IconButton
+	contentMarginTop unit.Dp
 }
 
 type ListMenuOption struct {
@@ -49,14 +51,25 @@ func NewListMenu(th *theme.Theme) *ListMenu {
 		labelWidth: unit.Dp(200),
 		menuContextArea: component.ContextArea{
 			Activation:       pointer.ButtonPrimary,
-			AbsolutePosition: true,
+			AbsolutePosition: false,
+			PositionHint:     layout.E,
 		},
 	}
 	return listMenu
 }
 
+func (l *ListMenu) ContentMarginTop(top unit.Dp) *ListMenu {
+	l.contentMarginTop = top
+	return l
+}
+
 func (l *ListMenu) SetLabel(label string) *ListMenu {
 	l.label = label
+	return l
+}
+
+func (l *ListMenu) SetIcon(icon *widget.Icon) *ListMenu {
+	l.icon = NewIconButton(l.theme, icon)
 	return l
 }
 
@@ -83,12 +96,28 @@ func (l *ListMenu) Layout(gtx layout.Context) layout.Dimensions {
 			}
 		}
 	}
+	if l.contentMarginTop == 0 {
+		l.contentMarginTop = unit.Dp(30)
+	}
 	l.updateMenuItems()
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return l.clickable.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return Label(l.theme, l.label).Layout(gtx)
+					return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+							if l.icon != nil {
+								return l.icon.Layout(gtx)
+							}
+							return layout.Dimensions{}
+						}),
+						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+							if l.label != "" {
+								return Label(l.theme, l.label).Layout(gtx)
+							}
+							return layout.Dimensions{}
+						}),
+					)
 				})
 			})
 		}),
@@ -96,7 +125,7 @@ func (l *ListMenu) Layout(gtx layout.Context) layout.Dimensions {
 			return l.menuContextArea.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return layout.E.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Inset{
-						Top:  unit.Dp(30),
+						Top:  l.contentMarginTop,
 						Left: unit.Dp(2),
 					}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						gtx.Constraints.Max.X = gtx.Dp(l.menuWidth)
@@ -115,14 +144,14 @@ func (l *ListMenu) Layout(gtx layout.Context) layout.Dimensions {
 func (l *ListMenu) updateMenuItems() {
 	l.menuState.Options = l.menuState.Options[:0]
 	for _, opt := range l.options {
-		opt := opt
+		currentOpt := opt
 		l.menuState.Options = append(l.menuState.Options, func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					itm := component.MenuItem(l.theme.Material(), &opt.clickable, opt.Text)
-					if opt.Icon != nil {
-						itm.Icon = opt.Icon
-						itm.IconColor = opt.IconColor
+					itm := component.MenuItem(l.theme.Material(), &currentOpt.clickable, currentOpt.Text)
+					if currentOpt.Icon != nil {
+						itm.Icon = currentOpt.Icon
+						itm.IconColor = currentOpt.IconColor
 					}
 					itm.Label.TextSize = l.theme.Size.DefaultTextSize
 					itm.Label.Color = l.theme.Color.DropdownTextColor
