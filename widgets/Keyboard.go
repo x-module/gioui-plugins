@@ -47,7 +47,7 @@ func NewKeyboard(theme *theme.Theme, win *app.Window) *Keyboard {
 
 // SetFilters 允许设置额外的事件过滤器。
 func (k *Keyboard) SetFilters(filters []event.Filter) *Keyboard {
-	k.filters = append(k.filters, filters...)
+	k.filters = filters
 	return k
 }
 
