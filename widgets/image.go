@@ -14,10 +14,12 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op/paint"
 	"gioui.org/widget"
+	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
 	"image"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"os"
 	"strings"
 )
@@ -48,12 +50,26 @@ func (i *Image) Layout(gtx layout.Context) layout.Dimensions {
 		Scale:    1.0,
 	}.Layout(gtx)
 }
+
+func getDefaultImage() image.Image {
+	data, err := resource.Asset("data/images/no-image.png")
+	if err != nil {
+		panic(err)
+	}
+	// 解码图片
+	img, _, err := image.Decode(bytes.NewReader(data))
+	if err != nil {
+		fmt.Println("Error decoding image: ", err)
+		panic(err)
+	}
+	return img
+}
 func (i *Image) LoadImage(fileName string) (image.Image, error) {
 	file, err := os.ReadFile(fmt.Sprintf("%s", fileName))
 	if err != nil {
-		return nil, err
+		log.Println("load image err:", err.Error())
+		return getDefaultImage(), nil
 	}
-
 	// 获取fileName后缀
 	temp := strings.Split(fileName, ".")
 	suffix := temp[len(temp)-1]

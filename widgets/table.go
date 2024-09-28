@@ -36,6 +36,7 @@ type Table struct {
 	data        [][]any
 	dataContent []widget.Bool
 	card        *Card
+	table       component.TableStyle
 }
 
 func NewTable(th *theme.Theme) *Table {
@@ -44,6 +45,8 @@ func NewTable(th *theme.Theme) *Table {
 		height: unit.Dp(30),
 		card:   NewCard(th).SetPadding(0).SetRadius(0),
 	}
+	table.table = component.Table(th.Material(), &table.grid)
+	table.table.AnchorStrategy = material.Overlay
 	return table
 }
 
@@ -118,18 +121,11 @@ func (t *Table) LayoutHoverTable(gtx layout.Context) layout.Dimensions {
 }
 
 func (t *Table) LayoutBorderTable(gtx layout.Context) layout.Dimensions {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("panic:", err)
-		}
-	}()
 	return widget.Border{
 		Color: t.theme.Color.BorderLightGrayColor,
 		Width: unit.Dp(1),
 	}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		table := component.Table(t.theme.Material(), &t.grid)
-		table.AnchorStrategy = material.Overlay
-		return table.Layout(gtx, len(t.data), len(t.headers),
+		return t.table.Layout(gtx, len(t.data), len(t.headers),
 			func(axis layout.Axis, index, constraint int) int {
 				switch axis {
 				case layout.Horizontal:
@@ -171,7 +167,11 @@ func (t *Table) LayoutBorderTable(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return NewLayout().CenterLayout(gtx, func(gtx layout.Context) layout.Dimensions {
-									label := material.Label(t.theme.Theme, unit.Sp(15), fmt.Sprint(t.data[row][col]))
+									showData := "noData"
+									if row < len(t.data) && col < len(t.data[row]) {
+										showData = fmt.Sprint(t.data[row][col])
+									}
+									label := material.Label(t.theme.Theme, unit.Sp(15), showData)
 									label.Alignment = text2.Middle
 									label.Color = t.theme.Color.DefaultTextWhiteColor
 									label.TextSize = t.theme.Size.DefaultTextSize

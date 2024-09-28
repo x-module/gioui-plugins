@@ -416,6 +416,8 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 				return NewImage(m.th, string(n.Destination)).Layout(gtx)
 			})
 		case *ast2.Table:
+			m.tableDatas = [][]any{}
+			m.tableHeaders = []string{}
 			m.walk(n, 0, "table")
 			table := NewTable(m.th)
 			table.SetData(m.tableDatas)
@@ -445,11 +447,10 @@ func (m *Markdown) walk(node ast.Node, level int, attr string) []layout.Widget {
 			// 	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx, childs...)
 			// })
 		case *ast2.TableRow:
-			cellData := []any{}
+			var cellData []any
 			for item := n.FirstChild(); item != nil; item = item.NextSibling() {
 				for sitem := item.FirstChild(); sitem != nil; sitem = sitem.NextSibling() {
 					if element, ok := sitem.(*ast.Text); ok {
-						element.Text(m.source)
 						cellData = append(cellData, string(element.Text(m.source)))
 					}
 				}
