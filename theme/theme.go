@@ -105,9 +105,14 @@ type Color struct {
 	ActionTipsBgGrayColor color.NRGBA
 	ProgressBarColor      color.NRGBA
 
-	MenuHoveredBgColor  color.NRGBA
-	MenuSelectedBgColor color.NRGBA
-	LogTextWhiteColor   color.NRGBA
+	MenuDefaultBgColor        color.NRGBA
+	MenuHoveredBgColor        color.NRGBA
+	MenuSelectedBgColor       color.NRGBA
+	MenuSelectedTextColor     color.NRGBA
+	MenuItemTextColor         color.NRGBA
+	MenuItemTextSelectedColor color.NRGBA
+
+	LogTextWhiteColor color.NRGBA
 
 	NotificationBgColor        color.NRGBA
 	NotificationTextWhiteColor color.NRGBA
@@ -127,9 +132,6 @@ type Color struct {
 	JsonNumberColor   color.NRGBA
 	JsonBoolColor     color.NRGBA
 	JsonNullColor     color.NRGBA
-
-	MenuItemTextColor         color.NRGBA
-	MenuItemTextSelectedColor color.NRGBA
 
 	CloseIconColor color.NRGBA
 	MinIconColor   color.NRGBA
@@ -330,8 +332,13 @@ func (t *Theme) dark() *Theme {
 	t.Color.ActionTipsBgGrayColor = color.NRGBA{A: 255, R: 48, G: 48, B: 51}
 	t.Color.ProgressBarColor = color.NRGBA{R: 127, G: 200, B: 235, A: 255}
 
-	t.Color.MenuHoveredBgColor = color.NRGBA{R: 45, G: 45, B: 48, A: 255}
-	t.Color.MenuSelectedBgColor = color.NRGBA{R: 35, G: 54, B: 51, A: 255}
+	t.Color.MenuDefaultBgColor = color.NRGBA{R: 34, G: 34, B: 38, A: 255}
+	t.Color.MenuHoveredBgColor = color.NRGBA{R: 13, G: 13, B: 15, A: 255}
+	t.Color.MenuSelectedBgColor = color.NRGBA{R: 23, G: 23, B: 26, A: 255}
+	t.Color.MenuSelectedTextColor = color.NRGBA{R: 4, G: 184, B: 99, A: 255}
+	t.Color.MenuItemTextColor = color.NRGBA{R: 150, G: 150, B: 150, A: 255}
+	t.Color.MenuItemTextSelectedColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+
 	t.Color.LogTextWhiteColor = color.NRGBA{R: 202, G: 202, B: 203, A: 255}
 
 	t.Color.NotificationBgColor = color.NRGBA{R: 72, G: 72, B: 77, A: 255}
@@ -349,9 +356,6 @@ func (t *Theme) dark() *Theme {
 	t.Color.JsonNumberColor = color.NRGBA{R: 41, G: 159, B: 171, A: 255}
 	t.Color.JsonBoolColor = color.NRGBA{R: 161, G: 112, B: 88, A: 255}
 	t.Color.JsonNullColor = color.NRGBA{R: 170, G: 118, B: 93, A: 255}
-
-	t.Color.MenuItemTextColor = color.NRGBA{R: 150, G: 150, B: 150, A: 255}
-	t.Color.MenuItemTextSelectedColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 
 	t.Color.CloseIconColor = color.NRGBA{R: 255, G: 95, B: 86, A: 255}
 	t.Color.MinIconColor = color.NRGBA{R: 255, G: 188, B: 45, A: 255}

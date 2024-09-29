@@ -59,7 +59,7 @@ func fill(gtx layout.Context, color color.NRGBA) layout.Dimensions {
 	return layout.Dimensions{Size: d}
 }
 
-func (c *Card) Layout(gtx layout.Context, children layout.Widget) layout.Dimensions {
+func (c *Card) Layout(gtx layout.Context, widget layout.Widget) layout.Dimensions {
 	return layout.Stack{}.Layout(gtx,
 		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
 			rect := clip.UniformRRect(image.Rectangle{Max: image.Point{
@@ -70,7 +70,7 @@ func (c *Card) Layout(gtx layout.Context, children layout.Widget) layout.Dimensi
 			return fill(gtx, c.bgColor)
 		}),
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-			return layout.UniformInset(c.padding).Layout(gtx, children)
+			return layout.UniformInset(c.padding).Layout(gtx, widget)
 		}),
 	)
 }

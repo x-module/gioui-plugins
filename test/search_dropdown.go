@@ -12,7 +12,7 @@ import (
 
 func main() {
 	th := theme.NewTheme()
-	dropDown := widgets.NewSearchDropDown(th, []string{"aaaaaa", "aab", "abc", "abcd"}...)
+	dropDown := widgets.NewSearchDropDown(th)
 	dropDown.SetOnChanged(func(value string) {
 		println(dropDown.GetSelected())
 	})
