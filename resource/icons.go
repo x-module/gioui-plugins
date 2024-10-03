@@ -266,3 +266,31 @@ var FullScreenExitIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationFullscreenExit)
 	return icon
 }()
+var NewIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.AVFiberNew)
+	return icon
+}()
+var ToggleStarBorderIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ToggleStarBorder)
+	return icon
+}()
+var ActionReceiptIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionReceipt)
+	return icon
+}()
+var ActionChromeReaderModeIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionChromeReaderMode)
+	return icon
+}()
+var ActionAssignmentIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionAssignment)
+	return icon
+}()
+var ActionDescriptionIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionDescription)
+	return icon
+}()
+var ContentAddIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ContentAdd)
+	return icon
+}()

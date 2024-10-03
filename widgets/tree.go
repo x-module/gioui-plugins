@@ -16,6 +16,7 @@ import (
 	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
+	"github.com/golang-module/carbon"
 	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
 	"image"
@@ -154,6 +155,7 @@ type TreeNode struct {
 	ClickCallback CallbackFun
 	Path          []int
 	IsDeleted     bool
+	CreateTime    carbon.Carbon
 }
 
 func (t *Tree) Layout(gtx layout.Context) layout.Dimensions {
@@ -223,6 +225,21 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 				})
 			}))
 		}
+	} else {
+		sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				gtx.Constraints.Max.X = gtx.Dp(t.theme.Size.DefaultIconSize)
+				return layout.Spacer{Width: t.theme.Size.DefaultIconSize}.Layout(gtx)
+			})
+		}))
+	}
+	if node.Icon != nil {
+		sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(5), Right: unit.Dp(8)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				gtx.Constraints.Max.X = gtx.Dp(t.theme.Size.DefaultIconSize)
+				return node.Icon.Layout(gtx, t.theme.Color.TreeIconColor)
+			})
+		}))
 	}
 	sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 		gtx.Constraints.Min.X = gtx.Dp(t.width)
@@ -251,7 +268,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 			}, func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(25))
 				return layout.Inset{Left: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return layout.Inset{Left: unit.Dp(loop * 20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return layout.Inset{Left: unit.Dp(loop * 13)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, sonItems...)
 					})
 				})
