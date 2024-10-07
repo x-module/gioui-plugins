@@ -16,6 +16,24 @@ func main() {
 	dropDown.SetOnChanged(func(value string) {
 		println(dropDown.GetSelected())
 	})
+	dropDown.SetOptions([]*widgets.SearchDropDownOption{
+		{
+			Value: "1",
+			Text:  "1",
+		},
+		{
+			Value: "2",
+			Text:  "2",
+		},
+		{
+			Value: "3",
+			Text:  "3",
+		},
+		{
+			Value: "4",
+			Text:  "4",
+		},
+	})
 	dropDown.SetWidth(unit.Dp(300))
 	card := widgets.NewCard(th)
 	win := window.NewApplication(new(app.Window))

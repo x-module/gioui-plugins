@@ -45,18 +45,21 @@ func NewModal(th *theme.Theme) *Modal {
 	})
 	return modal
 }
-func (m *Modal) SetWidth(width int) {
+func (m *Modal) SetWidth(width int) *Modal {
 	m.width = width
+	return m
 }
+func (m *Modal) SetHeight(height int) *Modal {
+	m.height = height
+	return m
+}
+
 func (m *Modal) Visible() bool {
 	return m.visible
 }
-func (m *Modal) SetTitle(title string) {
+func (m *Modal) SetTitle(title string) *Modal {
 	m.title = title
-}
-
-func (m *Modal) SetHeight(height int) {
-	m.height = height
+	return m
 }
 
 func (m *Modal) Display(content layout.Widget) {
@@ -104,13 +107,12 @@ func (m *Modal) Layout(gtx layout.Context) layout.Dimensions {
 										return label.Layout(gtx)
 									}),
 									layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-										return layout.Inset{Left: 470}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+										return layout.Inset{Left: unit.Dp(m.width - 30)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 											return m.closeIcon.Layout(gtx)
 										})
 									}),
 								)
 							})
-
 						})
 					}),
 					utils.DrawLineFlex(m.theme.Color.DefaultLineColor, unit.Dp(1), unit.Dp(m.width)),
