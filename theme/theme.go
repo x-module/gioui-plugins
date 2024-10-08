@@ -152,6 +152,12 @@ type Color struct {
 	MarkdownBlockquoteBgColorL5 color.NRGBA
 	MarkdownBlockquoteBgColorL6 color.NRGBA
 	MarkdownBlockquoteBgColorL7 color.NRGBA
+
+	RightMenuBgColor        color.NRGBA
+	RightMenuTextColor      color.NRGBA
+	RightMenuBorderColor    color.NRGBA
+	RightMenuHoveredBgColor color.NRGBA
+	RightMenuLineColor      color.NRGBA
 }
 
 type Theme struct {
@@ -377,6 +383,13 @@ func (t *Theme) dark() *Theme {
 	t.Color.MarkdownBlockquoteBgColorL5 = color.NRGBA{R: 103, G: 107, B: 113, A: 255}
 	t.Color.MarkdownBlockquoteBgColorL6 = color.NRGBA{R: 113, G: 118, B: 124, A: 255}
 	t.Color.MarkdownBlockquoteBgColorL7 = color.NRGBA{R: 122, G: 128, B: 134, A: 255}
+
+	t.Color.RightMenuBgColor = color.NRGBA{R: 45, G: 44, B: 42, A: 255}
+	// t.Color.RightMenuBgColor = color.NRGBA{R: 28, G: 29, B: 32, A: 255}
+	t.Color.RightMenuTextColor = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+	t.Color.RightMenuBorderColor = color.NRGBA{R: 79, G: 78, B: 77, A: 255}
+	t.Color.RightMenuHoveredBgColor = color.NRGBA{R: 23, G: 90, B: 193, A: 255}
+	t.Color.RightMenuLineColor = color.NRGBA{R: 70, G: 69, B: 67, A: 255}
 
 	t.Size.Tiny = ElementStyle{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}

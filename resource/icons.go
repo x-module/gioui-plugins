@@ -274,6 +274,10 @@ var ToggleStarBorderIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ToggleStarBorder)
 	return icon
 }()
+var ToggleStarIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ToggleStar)
+	return icon
+}()
 var ActionReceiptIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ActionReceipt)
 	return icon
