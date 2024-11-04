@@ -123,11 +123,13 @@ func (n *NoticeItem) layout(gtx layout.Context, theme *theme.Theme) layout.Dimen
 		},
 	)
 }
+
+func (n *Notice) Visible() bool {
+	return len(n.notice) > 0
+}
+
 func (n *Notice) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensions {
 	n.update()
-	if len(n.notice) == 0 {
-		return layout.Dimensions{}
-	}
 	return layout.NE.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Top: unit.Dp(20), Right: unit.Dp(20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return material.List(theme.Material(), n.list).Layout(gtx, len(n.notice), func(gtx layout.Context, index int) layout.Dimensions {

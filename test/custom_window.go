@@ -24,9 +24,31 @@ func main() {
 		Width:  800,
 	})
 	customWindow := widgets.NewWindow(th, win.GetWin())
+	menuItemOptions := []*widgets.ListMenuOption{
+		{
+			Text:  "属性",
+			Value: "profile",
+		},
+		{
+			Text:  "通知",
+			Value: "notice",
+		},
+		{
+			Text:  "退出",
+			Value: "exit",
+		},
+	}
+	menus := widgets.NewListMenu(th)
+	menus.SetLabel("土豆").SetOptions(menuItemOptions)
+	menus.SetLabelWidth(unit.Dp(50))
+	menus.SetMenuWidth(unit.Dp(100))
+	menus.Clicked(func(key int, menu string) {
+		fmt.Println(key, menu)
+	})
 	customWindow.SetContent(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Top: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return widgets.Label(th, "Hello World").Layout(gtx)
+			// return widgets.Label(th, "Hello World").Layout(gtx)
+			return menus.Layout(gtx)
 		})
 	})
 	customWindow.SetCloseWinHook(func() bool {

@@ -263,7 +263,7 @@ func (i *Input) Layout(gtx layout.Context) layout.Dimensions {
 }
 
 func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
-	borderWidth := unit.Dp(1)
+	borderWidth := unit.Dp(0.5)
 	if !i.hasBorder {
 		borderWidth = unit.Dp(0)
 	}

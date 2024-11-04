@@ -34,7 +34,7 @@ func main() {
 	menus := widgets.NewListMenu(th)
 	menus.SetLabel("土豆").SetOptions(menuItemOptions)
 	menus.SetLabelWidth(unit.Dp(50))
-	menus.SetMenuWidth(unit.Dp(100))
+	menus.SetMenuWidth(unit.Dp(200))
 	menus.Clicked(func(key int, menu string) {
 		fmt.Println(key, menu)
 	})
