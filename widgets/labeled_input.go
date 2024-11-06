@@ -57,9 +57,9 @@ func (l *LabeledInput) GetText() string {
 }
 
 func (l *LabeledInput) Layout(gtx layout.Context) layout.Dimensions {
-	// if l.inputWidth > 0 {
-	// 	l.input.SetWidth(l.inputWidth)
-	// }
+	if l.inputWidth > 0 {
+		l.input.SetWidth(l.inputWidth)
+	}
 	return layout.Flex{
 		Axis:      layout.Horizontal,
 		Alignment: layout.Middle,

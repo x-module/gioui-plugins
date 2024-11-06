@@ -15,6 +15,7 @@ import (
 	"gioui.org/widget/material"
 	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
+	"github.com/x-module/helper/debug"
 	"golang.org/x/exp/shiny/materialdesign/icons"
 	"image"
 	"image/color"
@@ -172,6 +173,7 @@ func (i *Input) SetSize(size theme.ElementStyle) *Input {
 }
 
 func (i *Input) SetText(text string) *Input {
+	debug.DumpPrint(i.editor)
 	i.editor.SetText(text)
 	return i
 }
