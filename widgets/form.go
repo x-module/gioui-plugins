@@ -39,7 +39,7 @@ func NewForm(th *theme.Theme, spaceHeight unit.Dp, labelWidth unit.Dp) *Form {
 	}
 }
 
-// 设置margin
+// SetMargin 设置margin
 func (f *Form) SetMargin(top, bottom, right, left unit.Dp) *Form {
 	f.marginTop = top
 	f.marginBottom = bottom
@@ -53,12 +53,16 @@ func (f *Form) Add(label string, widget layout.Widget) *Form {
 	f.element = append(f.element, widget)
 	return f
 }
+func (f *Form) AddButton(widget layout.Widget) *Form {
+	f.label = append(f.label, "")
+	f.element = append(f.element, widget)
+	return f
+}
 
 func (f *Form) Layout(gtx layout.Context) layout.Dimensions {
 	var elements []layout.FlexChild
 	for i := range f.label {
 		elements = append(elements, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			gtx.Constraints.Min.Y = gtx.Dp(f.spaceHeight)
 			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 					gtx.Constraints.Max.X = gtx.Dp(f.labelWidth)

@@ -295,7 +295,7 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 						gtx.Constraints.Min.Y = gtx.Dp(i.size.Height) // 设置最小高度为 100dp
 						gtx.Constraints.Max.Y = gtx.Constraints.Min.Y // 限制最大高度与最小高度相同
 						editor.TextSize = i.size.TextSize
-						editor.Color = i.size.TextColor
+						// editor.Color = i.size.TextColor
 						editor.LineHeight = i.lineHeight
 						editor.LineHeightScale = 1
 
@@ -313,7 +313,10 @@ func (i *Input) layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 
 					var widgets []layout.FlexChild
 					if i.before != nil {
-						widgets = append(widgets, layout.Rigid(i.before))
+						widgets = append(widgets, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+							gtx.Constraints.Max.X = gtx.Dp(i.size.IconSize)
+							return i.before(gtx)
+						}))
 					}
 					widgets = append(widgets, inputLayout)
 					if i.icon != nil {

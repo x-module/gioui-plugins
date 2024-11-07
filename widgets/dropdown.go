@@ -276,7 +276,7 @@ func (c *DropDown) SetSize(size image.Point) {
 }
 
 // Layout the DropDown.
-func (c *DropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensions {
+func (c *DropDown) Layout(gtx layout.Context) layout.Dimensions {
 	c.isOpen = c.menuContextArea.Active()
 
 	for i, opt := range c.options {
@@ -300,7 +300,7 @@ func (c *DropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensi
 	// Update menu items only if options change
 	if c.menuInit {
 		c.menuInit = false
-		c.updateMenuItems(theme)
+		c.updateMenuItems(c.theme)
 	}
 
 	if c.minWidth == 0 {
@@ -312,7 +312,7 @@ func (c *DropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensi
 		text = c.options[c.selectedOptionIndex].Text
 	}
 
-	box := c.box(gtx, theme, text, c.width)
+	box := c.box(gtx, c.theme, text, c.width)
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return box
@@ -328,7 +328,7 @@ func (c *DropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensi
 					if c.width != 0 {
 						gtx.Constraints.Max.X = gtx.Dp(c.width)
 					}
-					m := component.Menu(theme.Material(), &c.menu)
+					m := component.Menu(c.theme.Material(), &c.menu)
 					m.SurfaceStyle.Fill = c.theme.Color.DropDownBgGrayColor
 					return m.Layout(gtx)
 				})

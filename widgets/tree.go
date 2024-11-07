@@ -235,7 +235,7 @@ func (t *Tree) renderNode(gtx layout.Context, node *TreeNode, loop int, isParent
 	}
 	if node.Icon != nil {
 		sonItems = append(sonItems, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Inset{Top: unit.Dp(5), Right: unit.Dp(4)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(5), Right: unit.Dp(3)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints.Max.X = gtx.Dp(t.theme.Size.DefaultIconSize)
 				return node.Icon.Layout(gtx, t.theme.Color.TreeIconColor)
 			})

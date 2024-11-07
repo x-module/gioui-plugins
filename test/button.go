@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	var clickable widget.Clickable
 	var th = theme.NewTheme()
 	win := window.NewApplication(new(app.Window))
 	win.Title("Hello, Gio!").Size(window.ElementStyle{
@@ -28,11 +27,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.DefaultButton(th, &clickable, "你好", unit.Dp(100)).Layout(gtx)
+								return widgets.DefaultButton(th, &widget.Clickable{}, "你好", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.DefaultButton(th, &clickable, "default", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.DefaultButton(th, &widget.Clickable{}, "default", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -40,11 +39,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.TertiaryButton(th, &clickable, "Tertiary", unit.Dp(100)).Layout(gtx)
+								return widgets.TertiaryButton(th, &widget.Clickable{}, "Tertiary", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.TertiaryButton(th, &clickable, "Tertiary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.TertiaryButton(th, &widget.Clickable{}, "Tertiary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -52,11 +51,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.PrimaryButton(th, &clickable, "Primary", unit.Dp(100)).Layout(gtx)
+								return widgets.PrimaryButton(th, &widget.Clickable{}, "Primary", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.PrimaryButton(th, &clickable, "Primary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.PrimaryButton(th, &widget.Clickable{}, "Primary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -64,11 +63,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.PrimaryOutlineButton(th, &clickable, "Primary", unit.Dp(100)).Layout(gtx)
+								return widgets.PrimaryOutlineButton(th, &widget.Clickable{}, "Primary", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.PrimaryOutlineButton(th, &clickable, "Primary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.PrimaryOutlineButton(th, &widget.Clickable{}, "Primary", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -76,11 +75,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.InfoButton(th, &clickable, "Info", unit.Dp(100)).Layout(gtx)
+								return widgets.InfoButton(th, &widget.Clickable{}, "Info", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.InfoButton(th, &clickable, "Info", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.InfoButton(th, &widget.Clickable{}, "Info", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -88,11 +87,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.InfoOutlineButton(th, &clickable, "Info", unit.Dp(100)).Layout(gtx)
+								return widgets.InfoOutlineButton(th, &widget.Clickable{}, "Info", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.InfoOutlineButton(th, &clickable, "Info", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.InfoOutlineButton(th, &widget.Clickable{}, "Info", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -100,11 +99,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.SuccessButton(th, &clickable, "Success", unit.Dp(100)).Layout(gtx)
+								return widgets.SuccessButton(th, &widget.Clickable{}, "Success", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.SuccessButton(th, &clickable, "Success", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.SuccessButton(th, &widget.Clickable{}, "Success", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -112,11 +111,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.SuccessOutlineButton(th, &clickable, "Success", unit.Dp(100)).Layout(gtx)
+								return widgets.SuccessOutlineButton(th, &widget.Clickable{}, "Success", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.SuccessOutlineButton(th, &clickable, "Success", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.SuccessOutlineButton(th, &widget.Clickable{}, "Success", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -124,11 +123,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.WarningButton(th, &clickable, "Warning", unit.Dp(100)).Layout(gtx)
+								return widgets.WarningButton(th, &widget.Clickable{}, "Warning", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.WarningButton(th, &clickable, "Warning", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.WarningButton(th, &widget.Clickable{}, "Warning", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -136,11 +135,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.WarningOutlineButton(th, &clickable, "Warning", unit.Dp(100)).Layout(gtx)
+								return widgets.WarningOutlineButton(th, &widget.Clickable{}, "Warning", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.WarningOutlineButton(th, &clickable, "Warning", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.WarningOutlineButton(th, &widget.Clickable{}, "Warning", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -148,11 +147,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.ErrorButton(th, &clickable, "Error", unit.Dp(100)).Layout(gtx)
+								return widgets.ErrorButton(th, &widget.Clickable{}, "Error", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.ErrorButton(th, &clickable, "Error", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.ErrorButton(th, &widget.Clickable{}, "Error", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
@@ -160,11 +159,11 @@ func main() {
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.ErrorOutlineButton(th, &clickable, "Error", unit.Dp(100)).Layout(gtx)
+								return widgets.ErrorOutlineButton(th, &widget.Clickable{}, "Error", unit.Dp(100)).Layout(gtx)
 							}),
 							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return widgets.ErrorOutlineButton(th, &clickable, "Error", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
+								return widgets.ErrorOutlineButton(th, &widget.Clickable{}, "Error", unit.Dp(100)).SetIcon(resource.DeleteIcon, 0).Layout(gtx)
 							}),
 						)
 					}),
