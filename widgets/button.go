@@ -41,6 +41,7 @@ type Button struct {
 	// Color is the text color.
 	Color        color.NRGBA
 	TextSize     unit.Sp
+	IconSize     unit.Dp
 	Background   color.NRGBA
 	CornerRadius unit.Dp
 	Inset        layout.Inset
@@ -56,6 +57,14 @@ type Button struct {
 	errorButtonStyle    ButtonStyle
 }
 
+func (b *Button) SetTextSize(size unit.Sp) {
+	b.TextSize = size
+}
+
+// set iconSize
+func (b *Button) SetIconSize(size unit.Dp) {
+	b.IconSize = size
+}
 func (b *Button) Hovered(f func(gtx layout.Context)) {
 	b.hovered = f
 }
@@ -67,6 +76,7 @@ func DefaultButton(th *theme.Theme, button *widget.Clickable, txt string, width 
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.ButtonDefaultColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.ButtonBorderColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -109,6 +119,7 @@ func PrimaryButton(th *theme.Theme, button *widget.Clickable, txt string, width 
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.PrimaryColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.PrimaryColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -130,6 +141,7 @@ func PrimaryOutlineButton(th *theme.Theme, button *widget.Clickable, txt string,
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.ButtonDefaultColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.PrimaryColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -151,6 +163,7 @@ func InfoButton(th *theme.Theme, button *widget.Clickable, txt string, width uni
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.InfoColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.InfoColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -172,6 +185,7 @@ func InfoOutlineButton(th *theme.Theme, button *widget.Clickable, txt string, wi
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.ButtonDefaultColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.InfoColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -256,6 +270,7 @@ func WarningButton(th *theme.Theme, button *widget.Clickable, txt string, width 
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.WarningColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.WarningColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -277,6 +292,7 @@ func WarningOutlineButton(th *theme.Theme, button *widget.Clickable, txt string,
 		CornerRadius: th.Size.DefaultElementRadiusSize,
 		Background:   th.Color.ButtonDefaultColor,
 		TextSize:     th.Size.DefaultTextSize,
+		IconSize:     th.Size.DefaultIconSize,
 		bdColor:      th.Color.WarningColor,
 		Inset: layout.Inset{
 			Top: 8, Bottom: 8,
@@ -375,8 +391,8 @@ func (b Button) Layout(gtx layout.Context) layout.Dimensions {
 						iconDims := layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 							if b.Icon != nil {
 								return layout.Inset{Right: unit.Dp(5)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-									gtx.Constraints.Min.X = gtx.Dp(18)
-									gtx.Constraints.Min.Y = gtx.Dp(18)
+									gtx.Constraints.Min.X = gtx.Dp(b.IconSize)
+									gtx.Constraints.Min.Y = gtx.Dp(b.IconSize)
 									return b.Icon.Layout(gtx, b.Color)
 								})
 							}
