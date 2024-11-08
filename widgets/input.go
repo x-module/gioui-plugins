@@ -97,13 +97,13 @@ func NewTextArea(th *theme.Theme, hint string, text ...string) *Input {
 	return t
 }
 
-// set hasBorder
+// SetHasBorder set hasBorder
 func (i *Input) SetHasBorder(hasBorder bool) *Input {
 	i.hasBorder = hasBorder
 	return i
 }
 
-// lineHeight
+// SetLineHeight lineHeight
 func (i *Input) SetLineHeight(height unit.Sp) *Input {
 	i.lineHeight = height
 	return i

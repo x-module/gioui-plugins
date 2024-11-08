@@ -32,6 +32,12 @@ func main() {
 								return widgets.ErrorLabel(th, "Hello World").Layout(gtx)
 							}),
 						)
+					}), layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+								return widgets.Body1(th, "Hello World Body1").Layout(gtx)
+							}),
+						)
 					}),
 				)
 			}),

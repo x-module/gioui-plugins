@@ -392,7 +392,7 @@ func (t *Theme) dark() *Theme {
 
 	t.Size.Tiny = ElementStyle{TextSize: unit.Sp(9), Height: unit.Dp(10), Inset: layout.UniformInset(unit.Dp(4)), IconSize: unit.Dp(14)}
 	t.Size.Small = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(15), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(18)}
-	t.Size.Medium = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(20), Inset: layout.UniformInset(unit.Dp(6)), IconSize: unit.Dp(20)}
+	t.Size.Medium = ElementStyle{TextSize: unit.Sp(12), Height: unit.Dp(18), Inset: layout.UniformInset(unit.Dp(8)), IconSize: unit.Dp(20)}
 	t.Size.Large = ElementStyle{TextSize: unit.Sp(20), Height: unit.Dp(25), Inset: layout.UniformInset(unit.Dp(10)), IconSize: unit.Dp(30)}
 
 	t.Size.DefaultElementWidth = unit.Dp(500)
