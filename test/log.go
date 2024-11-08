@@ -16,7 +16,7 @@ func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
 	view := widgets.NewLogViewer(th, false)
-	view.SetData("asdfasdfasdfasdfasd")
+	view.SetData("asdfasdfas\ndfasdfasd")
 	card := widgets.NewCard(th)
 	win := window.NewApplication(new(app.Window))
 	win.Title("Hello, Gio!").Size(window.ElementStyle{

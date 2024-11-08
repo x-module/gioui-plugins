@@ -298,3 +298,7 @@ var ContentAddIcon *widget.Icon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.ContentAdd)
 	return icon
 }()
+var AVFiberManualRecordIcon *widget.Icon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.AVFiberManualRecord)
+	return icon
+}()
