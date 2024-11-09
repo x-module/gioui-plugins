@@ -2,15 +2,13 @@ package widgets
 
 import (
 	"fmt"
-	"github.com/x-module/gioui-plugins/theme"
-	"strings"
-
 	"gioui.org/font"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"github.com/x-module/gioui-plugins/theme"
 )
 
 type LogViewer struct {
@@ -37,8 +35,13 @@ func NewLogViewer(th *theme.Theme, scrollToEnd ...bool) *LogViewer {
 	return logView
 }
 
-func (j *LogViewer) SetData(data string) {
-	j.lines = strings.Split(data, "\n")
+func (j *LogViewer) Clean() {
+	j.lines = nil
+	j.selectables = nil
+}
+
+func (j *LogViewer) SetData(log string) {
+	j.lines = append(j.lines, log)
 	j.selectables = make([]*widget.Selectable, len(j.lines))
 	for i := range j.selectables {
 		j.selectables[i] = &widget.Selectable{}

@@ -17,10 +17,30 @@ import (
 	"github.com/x-module/gioui-plugins/window"
 )
 
+var steps = []widgets.StepItem{
+	{
+		Title: "Step 1",
+	},
+	{
+		Title: "Step 2",
+	},
+	{
+		Title: "Step 3",
+	},
+	{
+		Title: "Step 4",
+	},
+	{
+		Title: "Step 5",
+	},
+}
+
 func main() {
 	var th = theme.NewTheme()
 	card := widgets.NewCard(th)
 	step := widgets.NewStep(th)
+	step.SetSteps(steps)
+	step.SetCurrentStep(2)
 	win := window.NewApplication(new(app.Window)).CenterWindow()
 	win.Title("Hello, Gio!").Size(window.ElementStyle{
 		Height: 600,

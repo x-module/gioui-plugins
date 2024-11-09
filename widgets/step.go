@@ -9,17 +9,26 @@
 package widgets
 
 import (
-	"gioui.org/f32"
 	"gioui.org/layout"
 	"gioui.org/unit"
+	"gioui.org/widget/material"
 	"github.com/x-module/gioui-plugins/resource"
 	"github.com/x-module/gioui-plugins/theme"
-	"golang.org/x/exp/shiny/materialdesign/colornames"
 	"image/color"
 )
 
+var unDoColor = color.NRGBA{R: 53, G: 54, B: 56, A: 255}
+
+var doneColor = color.NRGBA{R: 46, G: 204, B: 113, A: 255}
+
+type StepItem struct {
+	Title string
+}
+
 type Step struct {
-	th *theme.Theme
+	th          *theme.Theme
+	steps       []StepItem
+	currentStep int
 }
 
 func NewStep(th *theme.Theme) *Step {
@@ -28,49 +37,86 @@ func NewStep(th *theme.Theme) *Step {
 	}
 }
 
-func (s *Step) Layout(gtx layout.Context) layout.Dimensions {
-	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+func (s *Step) SetCurrentStep(currentStep int) *Step {
+	s.currentStep = currentStep
+	return s
+}
+func (s *Step) SetSteps(steps []StepItem) *Step {
+	s.steps = steps
+	return s
+}
+
+func (s *Step) Label(txt string, color color.NRGBA) material.LabelStyle {
+	label := material.Label(s.th.Material(), s.th.Size.DefaultTextSize, txt)
+	label.Color = color
+	// label.Font.Weight = font.Bold
+	label.TextSize = s.th.Size.DefaultTextSize
+	return label
+}
+
+func (s *Step) LayoutStep() ([]layout.FlexChild, []layout.FlexChild) {
+	var stepChildren = []layout.FlexChild{
+		layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-				layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-					NewLine(s.th).Color(s.th.Color.GreenColor).Width(3).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X-100), 0))
-					return layout.Dimensions{Size: gtx.Constraints.Min}
-				}),
-				layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-					return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween}.Layout(gtx,
-						layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-							return layout.Spacer{Width: unit.Dp(110)}.Layout(gtx)
-						}),
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							// utils.DrawBackground(gtx, gtx.Constraints.Max, s.th.Color.BlueColor)
-							gtx.Constraints.Min.X = gtx.Dp(unit.Dp(40))
-							return resource.AVFiberManualRecordIcon.Layout(gtx, s.th.Color.GreenColor)
-						}),
-					)
-				}),
+			return layout.Inset{Top: unit.Dp(3)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return layout.Inset{Top: unit.Dp(6)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					return resource.AVFiberManualRecordIcon.Layout(gtx, doneColor)
+				})
+			})
+		}),
+	}
+	var tipChildren = []layout.FlexChild{
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			gtx.Constraints.Min.X = gtx.Dp(unit.Dp(105))
+			return layout.Inset{Top: unit.Dp(3), Left: unit.Dp(10)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return s.Label("Start", doneColor).Layout(gtx)
+			})
+		}),
+	}
+	for key, item := range s.steps {
+		stepChildren = append(stepChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(13)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				if key < s.currentStep {
+					return s.Label("──────────", doneColor).Layout(gtx)
+				}
+				return s.Label("──────────", unDoColor).Layout(gtx)
+			})
+		}))
+		stepChildren = append(stepChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{Top: unit.Dp(3)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return layout.Inset{Top: unit.Dp(6)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					if key < s.currentStep {
+						return resource.AVFiberManualRecordIcon.Layout(gtx, doneColor)
+					}
+					return resource.AVFiberManualRecordIcon.Layout(gtx, unDoColor)
+				})
+			})
+		}))
+		tipChildren = append(tipChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			gtx.Constraints.Min.X = gtx.Dp(unit.Dp(109))
+			return layout.Inset{Top: unit.Dp(3)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				if key < s.currentStep {
+					return s.Label(item.Title, doneColor).Layout(gtx)
+				}
+				return s.Label(item.Title, unDoColor).Layout(gtx)
+			})
+		}))
+	}
+	return stepChildren, tipChildren
+}
+
+func (s *Step) Layout(gtx layout.Context) layout.Dimensions {
+	stepChildren, tipChildren := s.LayoutStep()
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+				stepChildren...,
+			)
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+				tipChildren...,
 			)
 		}),
 	)
-}
-
-func drawStepProgressBar(gtx layout.Context, currentStep, totalSteps int) layout.Dimensions {
-	// 进度条背景
-	// 计算每一步的间距
-	stepWidth := gtx.Constraints.Max.X / totalSteps
-
-	// 绘制每一步的圆点
-	for i := 0; i < totalSteps; i++ {
-		clr := colornames.Grey400
-		if i < currentStep {
-			clr = colornames.LightGreenA700
-		}
-
-		drawCircle(gtx, color.NRGBA(clr), stepWidth*(i+1)-stepWidth/2, 10, 10)
-	}
-
-	return layout.Dimensions{Size: gtx.Constraints.Max}
-}
-
-func drawCircle(gtx layout.Context, clr color.NRGBA, x, y, radius int) {
-
 }
