@@ -132,7 +132,7 @@ func (i *Input) SetOnIconClick(f ActionFun) *Input {
 	i.onIconClick = f
 	return i
 }
-func (i *Input) SetonChanged(f ActionFun) *Input {
+func (i *Input) SetOnChanged(f ActionFun) *Input {
 	i.onChange = f
 	return i
 }

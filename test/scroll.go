@@ -1998,7 +1998,7 @@ func main() {
 		Width:  800,
 	})
 	filter := widgets.NewInput(th, "请输入搜索关键字...")
-	filter.SetonChanged(func(gtx layout.Context) {
+	filter.SetOnChanged(func(gtx layout.Context) {
 		fmt.Println("change:", filter.GetText())
 		keyWords = filter.GetText()
 	})
