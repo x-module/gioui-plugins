@@ -113,6 +113,10 @@ func (c *SearchDropDown) SetOnChanged(f func(value SearchDropDownOption)) {
 	c.onSelectedChange = f
 }
 
+// SetSearchInputValue 设置SearchInput 值
+func (c *SearchDropDown) SetSearchInputValue(value string) {
+	c.SearchInput.SetText(value)
+}
 func NewSearchDropDown(th *theme.Theme) *SearchDropDown {
 	c := &SearchDropDown{
 		SearchDropDown: &widget.Bool{Value: true},
@@ -231,6 +235,19 @@ func (c *SearchDropDown) SetMinWidth(minWidth unit.Dp) {
 	c.minWidth = minWidth
 }
 
+func (c *SearchDropDown) SetSelectedByTitle(title string) {
+	if len(c.options) == 0 {
+		return
+	}
+	for i, opt := range c.options {
+		if opt.Text == title {
+			c.selectedOptionIndex = i
+			c.lastSelectedIndex = i
+			break
+		}
+	}
+}
+
 // update
 func (c *SearchDropDown) update(gtx layout.Context) {
 	c.SearchInput.SetOnChanged(func(gtx layout.Context) {
@@ -241,7 +258,7 @@ func (c *SearchDropDown) update(gtx layout.Context) {
 }
 
 // Layout the SearchDropDown.
-func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensions {
+func (c *SearchDropDown) Layout(gtx layout.Context) layout.Dimensions {
 	// c.update(gtx)
 	c.isOpen = c.menuContextArea.Active()
 
@@ -258,7 +275,7 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 
 	if c.selectedOptionIndex != c.lastSelectedIndex {
 		// 赋值input框
-		c.SearchInput.SetText(c.GetSelected().Text + "[" + c.GetSelected().Value + "]")
+		c.SearchInput.SetText(c.GetSelected().Text)
 		if c.onSelectedChange != nil {
 			c.onSelectedChange(*c.options[c.selectedOptionIndex])
 		}
@@ -273,7 +290,7 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 	if c.selectedOptionIndex >= 0 && c.selectedOptionIndex < len(c.options) {
 		text = c.options[c.selectedOptionIndex].Text
 	}
-	box := c.box1(gtx, theme, text, c.width)
+	box := c.box1(gtx, c.theme, text, c.width)
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			// c.SearchInput.SetWidth(c.width).SetHasBorder(false)
@@ -293,7 +310,7 @@ func (c *SearchDropDown) Layout(gtx layout.Context, theme *theme.Theme) layout.D
 						gtx.Constraints.Max.X = gtx.Dp(c.width)
 					}
 					if len(c.menu.Options) > 0 {
-						m := component.Menu(theme.Material(), &c.menu)
+						m := component.Menu(c.theme.Material(), &c.menu)
 						m.SurfaceStyle.Fill = c.theme.Color.DropDownBgGrayColor
 						return m.Layout(gtx)
 					}
