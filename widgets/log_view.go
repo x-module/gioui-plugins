@@ -41,6 +41,7 @@ func (j *LogViewer) Clean() {
 }
 
 func (j *LogViewer) SetData(log string) {
+	j.lines = []string{}
 	j.lines = append(j.lines, log)
 	j.selectables = make([]*widget.Selectable, len(j.lines))
 	for i := range j.selectables {

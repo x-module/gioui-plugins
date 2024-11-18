@@ -1,7 +1,6 @@
 package widgets
 
 import (
-	"fmt"
 	"gioui.org/font"
 	"gioui.org/io/semantic"
 	"gioui.org/layout"
@@ -185,10 +184,8 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 
 				if t.btn.Clicked(gtx) {
 					if tabs.selected < tabIdx {
-						fmt.Println("PushLeft")
 						tabs.slider.PushLeft()
 					} else if tabs.selected > tabIdx {
-						fmt.Println("PushRight")
 						tabs.slider.PushRight()
 					}
 					tabs.selected = tabIdx

@@ -9,7 +9,6 @@
 package window
 
 import (
-	"fmt"
 	"gioui.org/app"
 	"gioui.org/io/system"
 	"gioui.org/layout"
@@ -99,11 +98,6 @@ func (i *Application) Run() {
 	i.win.Option(i.options...)
 	var ops op.Ops
 	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				fmt.Println(err)
-			}
-		}()
 		for {
 			e := i.win.Event()
 			switch e := e.(type) {

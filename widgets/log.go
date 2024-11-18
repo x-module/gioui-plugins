@@ -9,9 +9,8 @@
 package widgets
 
 import (
-	"fmt"
-	"gioui.org/app"
 	"gioui.org/layout"
+	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -23,38 +22,52 @@ type Log struct {
 	th      *theme.Theme
 	scroll  *Scroll
 	editor  widget.Editor
-	win     *app.Window
 	logData []string
 }
 
-func NewLog(th *theme.Theme, win *app.Window) *Log {
+func NewLog(th *theme.Theme) *Log {
 	return &Log{
 		th:     th,
 		scroll: NewScroll(th),
-		win:    win,
 	}
 }
 
-func (l *Log) SetLogData(data string) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("SetLogData panic: ", err)
-			l.SetLogData(data)
-		}
-	}()
+func (l *Log) InitData(data string) *Log {
+	data = strings.TrimSpace(data)
 	l.logData = append(l.logData, data)
 	l.editor.SetText(strings.Join(l.logData, "\n"))
-	l.win.Invalidate()
+	return l
+}
+func (l *Log) SetData(gtx layout.Context, data string) *Log {
+	data = strings.TrimSpace(data)
+	l.logData = append(l.logData, data)
+	l.editor.SetText(strings.Join(l.logData, "\n"))
+	gtx.Execute(op.InvalidateCmd{})
+	return l
+}
+
+func (l *Log) Reset() *Log {
+	l.logData = []string{}
+	return l
 }
 
 func (l *Log) Layout(gtx layout.Context) layout.Dimensions {
 	l.scroll.SetElementList([]layout.Widget{
 		func(gtx layout.Context) layout.Dimensions {
 			med := material.Editor(l.th.Material(), &l.editor, "")
-			med.TextSize = unit.Sp(16)
+			med.TextSize = l.th.Size.DefaultTextSize
 			med.Color = l.th.Color.HintTextColor
 			return med.Layout(gtx)
 		},
 	})
-	return l.scroll.Layout(gtx)
+	border := widget.Border{
+		Color:        l.th.Color.DefaultBgGrayColor,
+		Width:        unit.Dp(1),
+		CornerRadius: unit.Dp(4),
+	}
+	return border.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+			return l.scroll.Layout(gtx)
+		})
+	})
 }

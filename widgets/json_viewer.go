@@ -19,6 +19,7 @@ type JsonViewer struct {
 	lines       []string
 	selectables []*widget.Selectable
 	list        *widget.List
+	minHeight   unit.Dp
 }
 
 func NewJsonViewer(th *theme.Theme) *JsonViewer {
@@ -32,7 +33,7 @@ func NewJsonViewer(th *theme.Theme) *JsonViewer {
 	}
 }
 
-func (j *JsonViewer) SetData(data any) {
+func (j *JsonViewer) SetData(data any) *JsonViewer {
 	// 使用MarshalIndent序列化map，生成格式化的JSON字符串
 	// 第二个参数是每一行输出的前缀（通常为空）
 	// 第三个参数是每一级缩进的字符串，这里使用4个空格作为缩进
@@ -44,6 +45,13 @@ func (j *JsonViewer) SetData(data any) {
 	for i := range j.selectables {
 		j.selectables[i] = &widget.Selectable{}
 	}
+	return j
+}
+
+// set minHeight
+func (j *JsonViewer) SetminHeight(minHeight unit.Dp) *JsonViewer {
+	j.minHeight = minHeight
+	return j
 }
 
 func (j *JsonViewer) Layout(gtx layout.Context) layout.Dimensions {
@@ -52,9 +60,11 @@ func (j *JsonViewer) Layout(gtx layout.Context) layout.Dimensions {
 		Width:        unit.Dp(1),
 		CornerRadius: unit.Dp(4),
 	}
-
+	if j.minHeight > 0 {
+		gtx.Constraints.Min.Y = int(j.minHeight)
+	}
 	return border.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return layout.UniformInset(3).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+		return layout.UniformInset(10).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return material.List(j.theme.Material(), j.list).Layout(gtx, len(j.lines), func(gtx layout.Context, i int) layout.Dimensions {
 				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
