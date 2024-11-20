@@ -35,6 +35,15 @@ import (
 	"strings"
 )
 
+const (
+	StyleU     = "<u>"    // 下划线
+	StyleS     = "<s>"    // 删除线
+	StyleMark  = "<mark>" // 高亮
+	StyleSmall = "small"  // 小字体
+	StyleBig   = "big"    // 大字体
+	StyleBold  = "bold"   // 大字体
+)
+
 // Markdown renders the parsed Markdown to a list of widgets.
 type Markdown struct {
 	th         *theme.Theme

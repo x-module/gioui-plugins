@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"gioui.org/app"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/widget"
@@ -29,11 +30,13 @@ type NoticeItem struct {
 	EndAt     time.Time
 	closeIcon *IconButton
 	msgType   MsgType // 通知类型
+	win       *app.Window
 }
 
-func NewNoticeItem(th *theme.Theme) *NoticeItem {
+func NewNoticeItem(win *app.Window, th *theme.Theme) *NoticeItem {
 	notice := &NoticeItem{
 		theme:     th,
+		win:       win,
 		closeIcon: NewIconButton(th, resource.CloseIcon),
 	}
 	notice.closeIcon.SetOnClick(func(gtx layout.Context) {
@@ -61,11 +64,18 @@ func NewNotification() *Notice {
 
 // 过滤过期的通知
 func (n *Notice) update() {
-	for i := 0; i < len(n.notice); i++ {
-		if time.Now().After(n.notice[i].EndAt) {
-			n.notice = append(n.notice[:i], n.notice[i+1:]...)
-			i--
+	for {
+		var temp []*NoticeItem
+		for i := 0; i < len(n.notice); i++ {
+			if time.Now().After(n.notice[i].EndAt) {
+				n.notice[i].win.Invalidate()
+			} else {
+				temp = append(temp, n.notice[i])
+			}
 		}
+		n.notice = temp
+		// 	挺短500毫秒
+		time.Sleep(time.Second)
 	}
 }
 
@@ -129,7 +139,7 @@ func (n *Notice) Visible() bool {
 }
 
 func (n *Notice) Layout(gtx layout.Context, theme *theme.Theme) layout.Dimensions {
-	n.update()
+	go n.update()
 	return layout.NE.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Top: unit.Dp(20), Right: unit.Dp(20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return material.List(theme.Material(), n.list).Layout(gtx, len(n.notice), func(gtx layout.Context, index int) layout.Dimensions {
