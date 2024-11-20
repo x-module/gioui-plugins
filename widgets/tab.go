@@ -10,8 +10,8 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
 	"github.com/x-module/gioui-plugins/theme"
-	"github.com/x-module/gioui-plugins/utils"
 	"image"
 )
 
@@ -21,7 +21,7 @@ type Tabs struct {
 	tabs             []*Tab
 	selected         int
 	onSelectedChange func(Tab)
-	width            unit.Dp
+	width            int
 	currentTab       layout.Widget
 	slider           Slider
 }
@@ -57,7 +57,7 @@ func (tabs *Tabs) CurrentTab(gtx layout.Context) layout.Dimensions {
 	return tabs.slider.Layout(gtx, tabs.currentTab)
 }
 
-func (tabs *Tabs) SetWidth(width unit.Dp) {
+func (tabs *Tabs) SetWidth(width int) {
 	tabs.width = width
 }
 
@@ -167,14 +167,17 @@ func (tabs *Tabs) Layout(gtx layout.Context) layout.Dimensions {
 	}
 	return layout.Stack{Alignment: layout.W}.Layout(gtx,
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-			return layout.Inset{Top: unit.Dp(36)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return utils.DrawLine(gtx, tabs.theme.Color.DefaultLineColor, unit.Dp(1), tabs.width)
+			gtx.Constraints.Min.X = tabs.width
+			return layout.Inset{Top: unit.Dp(35)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				divider := component.Divider(tabs.theme.Material())
+				divider.Fill = tabs.theme.Color.DefaultLineColor
+				return divider.Layout(gtx)
 			})
 		}),
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return tabs.list.Layout(gtx, len(tabs.tabs), func(gtx layout.Context, tabIdx int) layout.Dimensions {
 				if tabs.width == 0 {
-					tabs.width = unit.Dp(gtx.Constraints.Min.X)
+					tabs.width = gtx.Constraints.Max.X
 				}
 				if tabIdx > len(tabs.tabs)-1 {
 					tabIdx = len(tabs.tabs) - 1

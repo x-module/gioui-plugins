@@ -67,12 +67,14 @@ type Color struct {
 	ButtonDefaultColor      color.NRGBA
 	ButtonTertiaryColor     color.NRGBA
 
-	WhiteColor   color.NRGBA
-	GreenColor   color.NRGBA
+	WhiteColor color.NRGBA
+	GreenColor color.NRGBA
+	RedColor   color.NRGBA
+	BlueColor  color.NRGBA
+
 	ErrorColor   color.NRGBA
 	WarningColor color.NRGBA
 	SuccessColor color.NRGBA
-	BlueColor    color.NRGBA
 	InfoColor    color.NRGBA
 	PrimaryColor color.NRGBA
 
@@ -315,13 +317,16 @@ func (t *Theme) dark() *Theme {
 	t.Color.ButtonTertiaryTextColor = color.NRGBA{R: 149, G: 149, B: 150, A: 255}
 	t.Color.ButtonDefaultTextColor = color.NRGBA{R: 216, G: 216, B: 217, A: 255}
 	t.Color.ButtonTextBlackColor = color.NRGBA{R: 0, G: 0, B: 0, A: 255}
+
 	t.Color.WhiteColor = color.NRGBA{R: 202, G: 202, B: 203, A: 255}
 	t.Color.GreenColor = color.NRGBA{R: 101, G: 231, B: 188, A: 255}
+	t.Color.BlueColor = color.NRGBA{R: 68, G: 137, B: 245, A: 255}
+	t.Color.RedColor = color.NRGBA{R: 200, G: 56, B: 84, A: 255}
+
 	t.Color.ErrorColor = color.NRGBA{R: 232, G: 127, B: 127, A: 255}
 	t.Color.WarningColor = color.NRGBA{R: 242, G: 201, B: 126, A: 255}
 	t.Color.SuccessColor = color.NRGBA{R: 99, G: 226, B: 184, A: 255}
 	t.Color.InfoColor = color.NRGBA{R: 113, G: 192, B: 231, A: 255}
-	t.Color.BlueColor = color.NRGBA{R: 68, G: 137, B: 245, A: 255}
 	t.Color.PrimaryColor = color.NRGBA{R: 99, G: 226, B: 184, A: 255}
 	t.Color.ButtonDefaultColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 	t.Color.ButtonTertiaryColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
