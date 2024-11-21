@@ -75,7 +75,7 @@ func (f *Form) Layout(gtx layout.Context) layout.Dimensions {
 								return layout.Inset{Top: unit.Dp(4), Right: unit.Dp(4)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 									labelText := f.label[i]
 									if labelText != "" {
-										labelText = labelText + "："
+										labelText = labelText + ":"
 									}
 									return Label(f.theme, labelText).Layout(gtx)
 								})

@@ -62,8 +62,9 @@ func (b *Button) SetTextSize(size unit.Sp) {
 }
 
 // set iconSize
-func (b *Button) SetIconSize(size unit.Dp) {
+func (b *Button) SetIconSize(size unit.Dp) *Button {
 	b.IconSize = size
+	return b
 }
 func (b *Button) Hovered(f func(gtx layout.Context)) {
 	b.hovered = f
