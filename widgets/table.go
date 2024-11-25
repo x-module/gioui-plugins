@@ -121,6 +121,8 @@ func (t *Table) LayoutHoverTable(gtx layout.Context) layout.Dimensions {
 }
 
 func (t *Table) LayoutBorderTable(gtx layout.Context) layout.Dimensions {
+	inset := layout.UniformInset(unit.Dp(2))
+	dims := inset.Layout(gtx, layout.Spacer{Height: t.height}.Layout)
 	return widget.Border{
 		Color: t.theme.Color.BorderLightGrayColor,
 		Width: unit.Dp(1),
@@ -131,7 +133,7 @@ func (t *Table) LayoutBorderTable(gtx layout.Context) layout.Dimensions {
 				case layout.Horizontal:
 					return constraint / len(t.headers)
 				default:
-					return 100
+					return dims.Size.Y
 				}
 			},
 			func(gtx layout.Context, index int) layout.Dimensions {
