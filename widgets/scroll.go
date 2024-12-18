@@ -18,7 +18,7 @@ import (
 
 type Scroll struct {
 	theme       *theme.Theme
-	list        *widget.List
+	List        *widget.List
 	elementList []layout.Widget
 	bgColor     color.NRGBA
 }
@@ -27,7 +27,7 @@ func NewScroll(th *theme.Theme) *Scroll {
 	p := &Scroll{
 		bgColor: th.Palette.Bg,
 		theme:   th,
-		list: &widget.List{
+		List: &widget.List{
 			List: layout.List{
 				Axis: layout.Vertical,
 				// ScrollToEnd: true,
@@ -39,7 +39,7 @@ func NewScroll(th *theme.Theme) *Scroll {
 
 // Axis
 func (n *Scroll) SetAxis(axis layout.Axis) *Scroll {
-	n.list.Axis = axis
+	n.List.Axis = axis
 	return n
 }
 
@@ -55,14 +55,14 @@ func (n *Scroll) SetBgColor(color color.NRGBA) *Scroll {
 
 // SetScrollToEnd 设置ScrollToEnd
 func (n *Scroll) SetScrollToEnd(scrollToEnd bool) *Scroll {
-	n.list.ScrollToEnd = scrollToEnd
+	n.List.ScrollToEnd = scrollToEnd
 	return n
 }
 
 func (n *Scroll) Layout(gtx layout.Context) layout.Dimensions {
 	// gtx.Constraints.Min.X = gtx.Dp(unit.Dp(150))
 	// utils.ColorBackground(gtx, gtx.Constraints.Max, n.bgColor)
-	list := material.List(n.theme.Material(), n.list)
+	list := material.List(n.theme.Material(), n.List)
 	list.AnchorStrategy = material.Overlay
 	gtx.Constraints.Min.X = gtx.Constraints.Max.X
 	return list.Layout(gtx, len(n.elementList), func(gtx layout.Context, index int) layout.Dimensions {

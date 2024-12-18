@@ -24,7 +24,7 @@ func NewLogViewer(th *theme.Theme, scrollToEnd ...bool) *LogViewer {
 		list: &widget.List{
 			List: layout.List{
 				Axis:        layout.Vertical,
-				ScrollToEnd: true,
+				ScrollToEnd: false,
 				Alignment:   layout.Baseline,
 			},
 		},

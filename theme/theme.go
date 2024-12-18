@@ -40,17 +40,20 @@ type Size struct {
 type Color struct {
 	DefaultWindowBgGrayColor  color.NRGBA
 	DefaultContentBgGrayColor color.NRGBA
-	CardBgColor               color.NRGBA
-	DefaultBgGrayColor        color.NRGBA
-	DefaultTextWhiteColor     color.NRGBA
-	DefaultLinkColor          color.NRGBA
-	DefaultBorderGrayColor    color.NRGBA
-	DefaultBorderBlueColor    color.NRGBA
-	DefaultLineColor          color.NRGBA
-	DefaultMaskBgColor        color.NRGBA
-	DefaultIconColor          color.NRGBA
 
-	TableHeaderBgColor color.NRGBA
+	TableHeaderBgColor         color.NRGBA
+	DefaultTableBgColor        color.NRGBA
+	DefaultTableHoveredBgColor color.NRGBA
+
+	CardBgColor            color.NRGBA
+	DefaultBgGrayColor     color.NRGBA
+	DefaultTextWhiteColor  color.NRGBA
+	DefaultLinkColor       color.NRGBA
+	DefaultBorderGrayColor color.NRGBA
+	DefaultBorderBlueColor color.NRGBA
+	DefaultLineColor       color.NRGBA
+	DefaultMaskBgColor     color.NRGBA
+	DefaultIconColor       color.NRGBA
 
 	InputInactiveBorderColor  color.NRGBA
 	InputActiveBorderColor    color.NRGBA
@@ -273,6 +276,15 @@ func (t *Theme) dark() *Theme {
 	t.Color.DefaultWindowBgGrayColor = color.NRGBA{R: 32, G: 34, B: 36, A: 255}
 	t.Color.DefaultContentBgGrayColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 
+	// t.Color.TableHeaderBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
+	// rgb(30, 31, 34)
+	// rgb(28, 29, 32)
+	t.Color.TableHeaderBgColor = color.NRGBA{R: 28, G: 29, B: 32, A: 255}
+	// rgb(28, 29, 32)
+	// rgb(30, 31, 34)
+	t.Color.DefaultTableBgColor = color.NRGBA{R: 30, G: 31, B: 34, A: 255}
+	t.Color.DefaultTableHoveredBgColor = color.NRGBA{R: 53, G: 54, B: 56, A: 255}
+
 	t.Color.DefaultBgGrayColor = color.NRGBA{R: 53, G: 54, B: 56, A: 255}
 	t.Color.DefaultTextWhiteColor = color.NRGBA{R: 223, G: 223, B: 224, A: 255}
 	t.Color.DefaultLinkColor = color.NRGBA{R: 107, G: 155, B: 250, A: 255}
@@ -281,8 +293,6 @@ func (t *Theme) dark() *Theme {
 	t.Color.DefaultLineColor = color.NRGBA{R: 43, G: 45, B: 49, A: 255}
 	t.Color.DefaultMaskBgColor = color.NRGBA{R: 10, G: 10, B: 12, A: 230}
 	t.Color.DefaultIconColor = color.NRGBA{R: 136, G: 136, B: 137, A: 255}
-
-	t.Color.TableHeaderBgColor = color.NRGBA{R: 24, G: 24, B: 28, A: 255}
 
 	t.Color.MenuBarBgColor = color.NRGBA{R: 39, G: 39, B: 42, A: 255}
 	t.Color.MenuBarBorderColor = color.NRGBA{R: 80, G: 80, B: 81, A: 255}

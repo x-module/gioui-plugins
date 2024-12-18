@@ -22,7 +22,7 @@ import (
 type Log struct {
 	sync.Mutex
 	th          *theme.Theme
-	scroll      *Scroll
+	Scroll      *Scroll
 	editor      *widget.Editor
 	logData     []string
 	editElement material.EditorStyle
@@ -33,7 +33,7 @@ type Log struct {
 func NewLog(th *theme.Theme) *Log {
 	log := &Log{
 		th:     th,
-		scroll: NewScroll(th),
+		Scroll: NewScroll(th),
 		editor: &widget.Editor{SingleLine: false},
 		border: widget.Border{
 			Color:        th.Color.DefaultBgGrayColor,
@@ -45,7 +45,7 @@ func NewLog(th *theme.Theme) *Log {
 	log.editElement = material.Editor(th.Material(), log.editor, "")
 	log.editElement.TextSize = th.Size.DefaultTextSize
 	log.editElement.Color = th.Color.HintTextColor
-	log.scroll.SetElementList([]layout.Widget{
+	log.Scroll.SetElementList([]layout.Widget{
 		log.editElement.Layout,
 	})
 	return log
@@ -85,7 +85,7 @@ func (l *Log) Layout(gtx layout.Context) layout.Dimensions {
 	l.editor.SetText(strings.Join(l.logData, "\n"))
 	return l.border.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return l.scroll.Layout(gtx)
+			return l.Scroll.Layout(gtx)
 		})
 	})
 }

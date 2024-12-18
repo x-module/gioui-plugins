@@ -94,9 +94,9 @@ func (t *Table) LayoutHoverTable(gtx layout.Context) layout.Dimensions {
 		t.dataFun = func(gtx layout.Context, row, col int) layout.Dimensions {
 			return t.dataContent[row].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				if t.dataContent[row].Hovered() {
-					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultContentBgGrayColor)
+					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultTableHoveredBgColor)
 				} else {
-					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultWindowBgGrayColor)
+					utils.DrawBackground(gtx, layout.Spacer{}.Layout(gtx).Size, t.theme.Color.DefaultTableBgColor)
 				}
 				NewLine(t.theme).Line(gtx, f32.Pt(0, 0), f32.Pt(float32(gtx.Constraints.Max.X), 0)).Layout(gtx)
 				labelDims := layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {

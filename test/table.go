@@ -34,7 +34,7 @@ func main() {
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
 		layout.UniformInset(unit.Dp(0)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			// return table.LayoutHoverTable(gtx)
-			return table.LayoutBorderTable(gtx)
+			return table.LayoutHoverTable(gtx)
 		})
 	})
 	win.Run()
