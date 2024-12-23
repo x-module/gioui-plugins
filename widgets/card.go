@@ -22,6 +22,10 @@ type Card struct {
 	theme   *theme.Theme
 	radius  int
 	padding unit.Dp
+	top     unit.Dp
+	left    unit.Dp
+	right   unit.Dp
+	bottom  unit.Dp
 	bgColor color.NRGBA
 }
 
@@ -45,6 +49,17 @@ func (c *Card) SetBgColor(bgColor color.NRGBA) *Card {
 }
 func (c *Card) SetPadding(padding unit.Dp) *Card {
 	c.padding = padding
+	c.top = padding
+	c.left = padding
+	c.right = padding
+	c.bottom = padding
+	return c
+}
+func (c *Card) SetPaddings(top, left, right, bottom unit.Dp) *Card {
+	c.top = top
+	c.left = left
+	c.right = right
+	c.bottom = bottom
 	return c
 }
 
@@ -70,7 +85,9 @@ func (c *Card) Layout(gtx layout.Context, widget layout.Widget) layout.Dimension
 			return fill(gtx, c.bgColor)
 		}),
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-			return layout.UniformInset(c.padding).Layout(gtx, widget)
+			return layout.Inset{Top: c.top, Left: c.left, Right: c.right, Bottom: c.bottom}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				return widget(gtx)
+			})
 		}),
 	)
 }
