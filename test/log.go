@@ -15,8 +15,22 @@ import (
 func main() {
 	var clickable widget.Clickable
 	th := theme.NewTheme()
-	view := widgets.NewLogViewer(th, false)
-	view.SetData("asdfasdfas\ndfasdfasd")
+
+	// fontPath := "/System/Library/Fonts/SFNS.ttf" // SF Pro
+	// fontPath := "/System/Library/Fonts/Monaco.ttf" // SF Pro
+	// fontPath := "/System/Library/Fonts/SFNSMono.ttf" // SF Pro
+	// fontData, err := os.ReadFile(fontPath)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// face, err := opentype.ParseCollection(fontData)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// th.Shaper = text.NewShaper(text.NoSystemFonts(), text.WithCollection(face))
+	// th.Shaper = text.NewShaper(text.NoSystemFonts(), text.WithCollection(gofont.Regular()))
+	log := widgets.NewLogViewer(th, true)
 	card := widgets.NewCard(th)
 	win := window.NewApplication(new(app.Window))
 	win.Title("Hello, Gio!").Size(window.ElementStyle{
@@ -25,6 +39,13 @@ func main() {
 	})
 	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
 	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
+		if clickable.Clicked(gtx) {
+			log.Debug("this is debug log")
+			log.Info("this is info log")
+			log.Warn("this is warn log")
+			log.Error("this is error log")
+			log.Fatal("this is fatal log")
+		}
 		// ==============================================
 		layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -38,7 +59,7 @@ func main() {
 
 					return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						gtx.Constraints.Min = gtx.Constraints.Max
-						return view.Layout(gtx, th)
+						return log.Layout(gtx)
 					})
 				}),
 			)

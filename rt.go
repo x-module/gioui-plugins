@@ -1,67 +1,288 @@
-package main
+/**
+ * Created by GoLand
+ * @file   errors.go
+* @author 李锦 <Lijin@cavemanstudio.net>
+ * @date   2022/5/26 19:36
+ * @desc   错误信息定义,沿用nakama，所有的错误码都是201 ，故此系统定义的错误码都是201,无需单独定义
+*/
 
-import (
-	"gioui.org/app"
-	"gioui.org/layout"
-	"gioui.org/op"
-	"gioui.org/text"
-	"gioui.org/unit"
-	"gioui.org/widget"
-	"gioui.org/widget/material"
-	"github.com/x-module/gioui-plugins/theme"
-	"github.com/x-module/gioui-plugins/widgets"
-	"github.com/x-module/gioui-plugins/window"
-	"image/color"
-	"log"
+package global
+
+// 系统功能
+const (
+	StartServerErr                          = 1000 + iota // 启动服务异常
+	SystemErr                                             // 系统异常
+	RequestErr                                            // 非法调用
+	ParamsError                                           // 参数异常，请检查
+	ParseJsonErr                                          // 解析json异常
+	SystemCrashErr                                        // 系统崩溃异常  trace:%s
+	PlayerIdErr                                           // 玩家ID异常
+	BroadcastMessageErr                                   // Error broadcasting Event opcode: %d, err: %v
+	RequestClientErr                                      // 请求方异常，玩家调用
+	RpcCheckLoginErr                                      // RPC-检查登录信息异常
+	RpcMatchPartyErr                                      // RPC-匹配现有的party异常
+	RequestRpcErr                                         // 请求方异常，只允许玩家调用
+	SendNotificationErr                                   // 发送通知异常
+	DescribeMatchmakingErr                                // 获取匹配详情异常
+	MatchmakerPlayerEmptyErr                              // 匹配玩家列表为空
+	StopMatchmakingErr                                    // 停止匹配异常
+	SendMatchmakerStartNoticeErr                          // 发送匹配开始通知异常
+	MatchmakerNoticeTypeErr                               // 错误的通知类型
+	MatchmakerNoticeErr                                   // 处理通知异常
+	MatchmakerNoticeUnmarshalErr                          // 解析匹配通知异常
+	ParseGameSessionArnErr                                // 解析游戏会话ARN异常
+	PlayerBlueprintSaveErr                                // 玩家蓝图保存异常
+	PlayerBlueprintDelErr                                 // 玩家蓝图删除异常
+	PlayerBlueprintReadErr                                // 玩家蓝图读取异常
+	PlayerBlueprintEmptyErr                               // 玩家蓝图为空异常
+	PlayerBlueprintParseErr                               // 玩家蓝图解析异常
+	PlayerDataReadErr                                     // 玩家数据读取异常
+	PlayerDataSaveErr                                     // 玩家数据保存异常
+	PlayerDataEmptyErr                                    // 玩家数据为空异常
+	PlayerBlueprintFinishErr                              // 玩家蓝图已完成
+	PlayerBlueprintResourceMetadataEmptyErr               // 玩家蓝图奖励数据为空
+	PlayerBlueprintResourceMetadataParseErr               // 玩家蓝图奖励数据解析异常
+	PlayerResourceNotEnoughErr                            // 玩家货币不足
+	PlayerWalletGetErr                                    // 玩家钱包获取异常
+	PlayerWalletSaveErr                                   // 玩家钱包保存异常
+	PlayerWalletParseErr                                  // 玩家钱包解析异常
+	PlayerWalletUpdateErr                                 // 玩家钱包更新异常
+	PlayerContractSaveErr                                 // 玩家合约保存异常
+	SourceReadErr                                         // 资源数据读取异常
+	SourceParseErr                                        // 资源数据解析异常
+	SourceEmptyErr                                        // 资源数据空异常
+	PlayerBlueprintRewardErr                              // 玩家获取蓝图奖励异常
+	PlayerBlueprintNotExistErr                            // 玩家获取蓝图不存在
+	PlayerBlueprintRewardEmptyErr                         // 玩家获取蓝图奖励数据为空
+	UpdatePlayerContractErr                               // 更新玩家合约异常
+	UpdateContractErr                                     // 更新合约异常
+	BoxEmptyErr                                           // 箱子为空
+	BoxNotExistErr                                        // 箱子不存在
+	ResourceNoExistErr                                    // 资源不存在
+	ResourceExtendEmptyErr                                // 资源扩展数据为空异常
+	ResourceExtendParseErr                                // 资源扩展数据解析异常
+	GrantBoxRewardErr                                     // 发放箱子奖励异常
+	UnSupportBoxTypeErr                                   // 不支持的资源类型
+	ResourceTypeEmptyErr                                  // 资源类型为空异常
+	ContractNotExistErr                                   // 合约不存在
+	ActiveContractErr                                     // 激活合约异常
+	CancelActiveContractErr                               // 取消激活合约异常
+	ResourceTypeErr                                       // 资源类型异常
+	ContractNotFinishErr                                  // 合约未完成异常
+	ResourceNotExistErr                                   // 资源不存在
+	GetContractExtendErr                                  // 获取合约扩展数据异常
+	GrantRewardErr                                        // 发放奖励异常
+	ContractTypeErr                                       // 合约类型异常
+	ResourceKeyErr                                        // 资源key异常
+	GetResourceItemIdErr                                  // 获取资源ID异常
+	NormalItemSaveErr                                     // 保存常规道具异常
+	NormalItemReadErr                                     // 读取常规道具异常
+	BlueprintSaveErr                                      // 保存蓝图异常
+	BlueprintReadErr                                      // 读取蓝图异常
+	ResourceSaveErr                                       // 保存资源异常
+	ResourceReadErr                                       // 读取资源异常
+	GrantBoxErr                                           // 发放盒子奖励异常
+	GrantBlueprintErr                                     // 发放蓝图奖励异常
+	ContractSaveErr                                       // 保存合约异常
+	ContractReadErr                                       // 读取合约异常
+	PlayerBoxReadErr                                      // 读取玩家盒子异常
+	PlayerBoxSaveErr                                      // 保存玩家盒子异常
+	PendantSaveErr                                        // 保存挂件皮肤异常
+	PendantReadErr                                        // 读取挂件异常
+	RoleSaveErr                                           // 角色保存异常
+	RoleReadErr                                           // 角色读取异常
+	RoleSkinSaveErr                                       // 角色皮肤保存异常
+	RoleSkinReadErr                                       // 角色皮肤读取异常
+	WeaponSkinSaveErr                                     // 武器皮肤保存异常
+	WeaponSkinReadErr                                     // 武器皮肤读取异常
+	MICASkinSaveErr                                       // MICA皮肤保存异常
+	MICASkinReadErr                                       // MICA皮肤读取异常
+	DogTagSaveErr                                         // 狗牌保存异常
+	DogTagReadErr                                         // 狗牌读取异常
+	AccessorySkinSaveErr                                  // 配件皮肤保存异常
+	AccessorySkinReadErr                                  // 配件皮肤读取异常
+	CamouflageReadErr                                     // 读取迷彩key异常
+	CamouflageSaveErr                                     // 保存迷彩key异常
+	ContractUnActiveErr                                   // 合约未激活
+	ContractHasActiveErr                                  // 合约已激活
+	ContractHasFinishErr                                  // 合约已完成
+	AttributeReadErr                                      // 读取玩家属性异常
+	UpgradeRankErr                                        // 升级段位异常
+	PlayerUpgradeErr                                      // 玩家升级异常
+	UpdateExperienceErr                                   // 更新玩家经验异常
+	WalletIdErr                                           // 钱包ID异常
+	RankErr                                               // 段位异常
+	DailyTaskSaveErr                                      // 保存每日任务异常
+	DailyTaskReadErr                                      // 读取每日任务异常
+	NoDailyTaskErr                                        // 没有每日任务异常
+	DailyTaskResourceErr                                  // 每日任务资源异常
+	DailyTaskDeleteErr                                    // 删除每日任务异常
+	RewardPoolEmptyErr                                    // 奖池数据为空异常
+	WeightRandomErr                                       // 权重随机异常
+	BoxRewardNotExistErr                                  // 箱子奖励不存在
+	ContractOutTimeErr                                    // 合约过期异常
+	PerkReadErr                                           // 读取玩家津贴异常
+	PerkSaveErr                                           // 保存玩家津贴异常
+	PerkDeleteErr                                         // 删除玩家津贴异常
+	GetInventoryErr                                       // 获取玩家库存异常
+	DeleteMatchmakingTicketErr                            // 删除匹配票异常
+	CreateLeaderBoardErr                                  // 创建排行榜异常
+	WriteLeaderBoardErr                                   // 写入排行榜异常
+	ReadLeaderBoardErr                                    // 读取排行榜异常
+	InitOnlineConfigErr                                   // 初始化在线配置异常
+	ReadOnlineConfigErr                                   // 读取在线配置异常
+	UnSaveLeaderBoardErr                                  // 保存排行榜数据未开启异常
+	VerifyPlayerBuyErr                                    // 验证玩家购买异常
+	PlayerNotBuyErr                                       // 玩家未购买异常
+	SkuNotExistErr                                        // SKU不存在
+	ConsumeGoodsErr                                       // Oculus消耗商品异常
+	GetAllPurchasesErr                                    // Oculus获取所有购买记录异常
+	InitTxnErr                                            // 初始化交易异常
+	FinalizeTxnErr                                        // 完成交易异常
+	OrderSaveErr                                          // 保存订单异常
+	OrderReadErr                                          // 读取订单异常
+	CustomIdEmptyErr                                      // 自定义ID为空异常
+	GetCustomIdErr                                        // 获取自定义ID异常
+	PlayerDiamondNotEnoughErr                             // 玩家钻石不足
+	ChargeDiamondErr                                      // 充值钻石异常
+	ChargeErr                                             // 充值钻石异常
+	BuyTypeErr                                            // 购买类型异常
+	GoodsNotExistErr                                      // 商品不存在
+	BuyCountErr                                           // 购买数量异常
+	GoodsNotBlueprintErr                                  // 商品不是蓝图
+	UpdateDiamondErr                                      // 更新玩家钻石异常
+	AchievementSaveErr                                    // 保存成就异常
+	AchievementReadErr                                    // 读取成就异常
+	NoWeaponCategoryErr                                   // 没有武器分类异常
+	JsonUnmarshalErr                                      // json解析异常
+	BadgeSaveErr                                          // 保存徽章异常
+	BadgeReadErr                                          // 读取徽章异常
+	PurchaseRecordSaveErr                                 // 保存购买记录异常
+	PurchaseRecordReadErr                                 // 读取购买记录异常
+	GoodsPriceErr                                         // 商品价格异常
+	DeleteMatchmakerUserErr                               // 删除匹配用户异常
+	ReadMatchmakingUserErr                                // 读取匹配用户异常
+	GetUnpaidOrdersErr                                    // 获取未支付订单异常
+	AddInventoryErr                                       // Steam添加仓库物品异常
+	ConsumeInventoryErr                                   // Steam消耗仓库物品异常
+	GetStreamCountErr                                     // 获取流数量异常
+	TokenExpiredErr                                       // Token过期异常
+	TokenNotMatchErr                                      // Token不匹配
+	OrderUnPaidErr                                        // 订单未支付异常
+	NoLeaderErr                                           // 当前操人非Leader
+	RetryOpenBoxErr                                       // 重试开箱子异常
+	RetrySaveBoxErr                                       // 重试保存箱子异常
+	ReadParamsConfigErr                                   // 读取参数配置异常
+	ParamsConfigSaveErr                                   // 保存参数配置异常
+	ReadBulletinConfigErr                                 // 获取公告配置异常
+	BulletinConfigSaveErr                                 // 保存公告配置异常
+	GetLeaderboardListErr                                 // 获取排行榜列表异常
+	GetLeaderboardErr                                     // 获取排行榜异常
+	MatchmakerPlayerCountErr                              // 匹配玩家数量异常
+	MatchmakerOffErr                                      // 匹配关闭
+	LoginActivitySaveErr                                  // 保存登录活动异常
+	LoginActivityReadErr                                  // 读取登录活动异常
+	SendLoginActivityRewardErr                            // 发放登录活动奖励异常
+	ApiKeyErr                                             // API密钥异常
+	ExtendReadErr                                         // 读取活动扩展异常
+	ExtendSaveErr                                         // 保存活动扩展异常
+	ExtendRewardReceivedErr                               // 活动扩展奖励已领取异常
+	ActivitySaveErr                                       // 保存活动异常
+	ActivityReadErr                                       // 读取活动异常
+	ActivityUpdateErr                                     // 更新活动异常
+	ActivityLevelErr                                      // 活动等级异常
+	ActivityReceivedErr                                   // 活动已领取异常
+	ActivityNotExistErr                                   // 活动不存在
+	ActivityScoreErr                                      // 活动分数异常
+	AlreadyActivityVipErr                                 // 已经是VIP异常
+	UpdateContractProgressErr                             // 更新合约进度异常
+	ReceiveContractRewardsErr                             // 领取合约奖励异常
+	GetActivityScoreErr                                   // 获取活动分数异常
+	GetFriendsErr                                         // 获取好友异常
+	UpdateMatchScoreErr                                   // 更新玩家比赛获得的活动积分异常
+	ActivityScoreNotMatchErr                              // 活动积分不匹配
+	KeywordTooShortErr                                    // 关键字太短
+	InvalidTokenErr                                       // 无效的Token异常
+	RequestOculusApiErr                                   // 请求Oculus API异常
+	UnofficialDownloadErr                                 // 非官方下载异常
+	ReadImageActivityConfigErr                            // 读取集图活动配置异常
+	SaveImageActivityConfigErr                            // 保存集图活动配置异常
+	LootSaveErr                                           // 保存战利品异常
+	LootReadErr                                           // 读取战利品异常
+	WarfareGoodsNotExistErr                               // 购买战利品不存在
+	WarfareDollarNotEnoughErr                             // 玩家战力币不足
+	WarfarePerkPointNotEnoughErr                          // 玩家PerkPoint不足
+	WarfareSaleGoodsNotExistErr                           // 出售战利品不存在
+	WarfareSaleGoodsEmptyErr                              // 出售战利品为空异常
+	WarfareBuyRecordReadErr                               // 读取购买记录异常
+	WarfareBuyRecordSaveErr                               // 保存购买记录异常
+	WarfareBuyGoodsOverStockErr                           // 购买战利品超过库存
+	WarfareTaskNotExistErr                                // 任务不存在
+	WarfareTaskReadErr                                    // 读取任务异常
+	WarfareTaskSaveErr                                    // 保存任务异常
+	WarfareTaskReceivedErr                                // 玩家已经领取该任务
+	WarfareTaskPlayerNotExistErr                          // 玩家任务不存在
+	WarfareTaskStatusErrorErr                             // 任务状态异常
+	WarfareTaskFinishErr                                  // 任务已完成
+	WarfareShopLevelReadErr                               // 读取商店等级异常
+	WarfareShopLevelSaveErr                               // 保存商店等级异常
+	WarfarePlayerLevelConfigGetErr                        // 获取玩家等级配置异常
+	WarfareShopLevelConfigGetErr                          // 获取商店等级配置异常
+	WarfareExpNameErrorErr                                // 经验名称异常
+	WarfareBuyGoodsCountErr                               // 购买商品数量异常
+	WarfareExchangeGoodsCountErr                          // 兑换商品数量异常
+	WarfareExchangeGoodsNotExistErr                       // 兑换商品不存在
+	WarfareExchangeGoodsNotSupportErr                     // 不支持的兑换商品
+	WarfareExchangeGoodsNotEnoughErr                      // 兑换商品不足
+	WarfareTaskSubmitGoodsCountErr                        // 提交任务商品数量异常
+	WarfareTaskSubmitGoodsNotMatchErr                     // 提交任务商品不匹配
+	WarfareSaleShopNotExistErr                            // 出售商店不存在
+	WarfareSaleShopPriceNotConfigErr                      // 出售商店价格未配置
+	WarfareSaleGoodsPriceErr                              // 出售商品价格异常
+	UpdateWfDollarErr                                     // 更新战力币异常
+	UpdatePerkPointErr                                    // 更新PerkPoint异常
+	WarfareCashIdErr                                      // 战力币ID异常
+	GraphicsCardIncomeNotConfigErr                        // 配置 graphicsCardIncome 异常
+	GraphicsCardZoneNotExistErr                           // 显卡区域不存在
+	WarfareZoneServiceNotOpenErr                          // 服务未开启
+	WarfareZoneTimeNotArrivedErr                          // 时间未到
+	WarfareRewardIdErr                                    // 奖励ID异常
+	ScavMatchReadErr                                      // 读取比赛异常
+	ScavMatchSaveErr                                      // 保存比赛异常
+	DbBeginTxErr                                          // 开启事务异常
+	ScavJoinMatchPlayerCountErr                           // 加入比赛玩家数量异常
+	ScavMatchJoinErr                                      // 加入比赛异常
+	NoMatchJoinErr                                        // 没有可加入的比赛
+	JoinScavMatchInfoReadErr                              // 读取加入比赛信息异常
+	JoinScavMatchInfoSaveErr                              // 保存加入比赛信息异常
+	ScavJoinMatchIntervalErr                              // 加入比赛时间间隔异常
+	ReceiverIdsErr                                        // 接收者ID异常
+	NoticeCodeErr                                         // 通知码异常
+	GoodsNotExistsErr                                     // 物品不存在
+	GraphicsCardCountErr                                  // 显卡数量异常
+	InvalidMoneyErr                                       // 无效的金额异常
+	WarfareBuffReadErr                                    // 读取Buff异常
+	WarfareBuffSaveErr                                    // 保存Buff异常
+	WarfareBuffLevelNotFoundErr                           // Buff等级未找到
+	LevelMaxErr                                           // 等级已达最大值
+	AreaUpgradeConfigNotExistErr                          // 区域升级配置不存在
+	AreaUpgradeConditionNotMeetErr                        // 升级条件未满足
+	DataFormatErr                                         // 数据格式异常
+	LootsEmptyErr                                         // 战利品为空
+	GeneratorNotExistErr                                  // 发电机不存在
+	LootNotExistErr                                       // 场景数据不存在
+	WarfareRecoveryReadErr                                // 玩家回血读取异常
+	WarfareRecoverySaveErr                                // 玩家回血保存异常
+	VersionReadErr                                        // 读取版本异常
+	ReadServerStatusErr                                   // 读取服务状态数据异常
+	SaveServerStatusErr                                   // 保存服务状态数据异常
+	ExchangeColorCountConfigErr                           // 兑换颜色数量配置异常
+	ReadWeeklyExchangeErr                                 // 读取周常兑换数据异常
+	SaveWeeklyExchangeErr                                 // 保存周常兑换数据异常
+	GenerateWeeklyExchangeErr                             // 生成周常兑换数据异常
+	WarfareExchangeWeekErr                                // 战力兑换周异常
+	WarfareExchangeShopNotExistErr                        // 战力兑换商店不存在
+	ReadWeeklyExchangeRecordErr                           // 读取周常兑换记录数据异常
+	SaveWeeklyExchangeRecordErr                           // 保存周常兑换记录数据异常
+	WarfareExchangeRecordExistErr                         // 本周兑换记录已存在
 )
-
-var th = theme.NewTheme()
-
-func init() {
-	th.Color.CardBgColor = color.NRGBA{R: 44, G: 44, B: 44, A: 255}
-	th.Color.DefaultWindowBgGrayColor = color.NRGBA{R: 30, G: 30, B: 30, A: 255}
-}
-
-func main() {
-	card := widgets.NewCard(th)
-	editor := widget.Editor{
-		Alignment:  text.Start,
-		SingleLine: true,
-	}
-	editor1 := widget.Editor{
-		Alignment:  text.Start,
-		SingleLine: true,
-	}
-	editor.SetText("### title")
-	editor1.SetText("### 22222")
-	card.SetRadius(0)
-	win := window.NewApplication(new(app.Window)).CenterWindow()
-	win.Title("Hello, Gio!").Size(window.ElementStyle{
-		Height: 600,
-		Width:  800,
-	})
-	win.BackgroundColor(th.Color.DefaultWindowBgGrayColor)
-	win.Frame(func(gtx layout.Context, ops op.Ops, win *app.Window) {
-		layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return card.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						ed := material.Editor(th.Material(), &editor, "editor")
-						// processKey(gtx, &editor)
-						if gtx.Focused(&editor) {
-							log.Println("editor focused")
-						} else {
-							log.Println("editor lost focus")
-						}
-						return ed.Layout(gtx)
-					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						ed := material.Editor(th.Material(), &editor1, "editor")
-						return ed.Layout(gtx)
-					}),
-				)
-			})
-		})
-	})
-	win.Run()
-}

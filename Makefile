@@ -7,4 +7,4 @@ help:			## Help command
 
 .PHONY: bind
 bind:		## Build the binary
-	 ~/go/bin/go-bindata -pkg resource -o resource/resource.go  data/images
+	 ~/go/bin/go-bindata -pkg resource -o resource/resource.go  data/images data/fonts

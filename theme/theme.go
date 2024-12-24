@@ -30,6 +30,7 @@ type Size struct {
 
 	DefaultElementWidth      unit.Dp
 	DefaultTextSize          unit.Sp
+	DefaultLogTextSize       unit.Sp
 	DropdownTextSize         unit.Sp
 	DefaultIconSize          unit.Dp
 	DefaultElementRadiusSize unit.Dp
@@ -74,6 +75,12 @@ type Color struct {
 	GreenColor color.NRGBA
 	RedColor   color.NRGBA
 	BlueColor  color.NRGBA
+
+	LogDebugColor   color.NRGBA
+	LogInfoColor    color.NRGBA
+	LogWarnColor    color.NRGBA
+	LogErrorColor   color.NRGBA
+	LogFataCorColor color.NRGBA
 
 	ErrorColor   color.NRGBA
 	WarningColor color.NRGBA
@@ -333,6 +340,13 @@ func (t *Theme) dark() *Theme {
 	t.Color.BlueColor = color.NRGBA{R: 68, G: 137, B: 245, A: 255}
 	t.Color.RedColor = color.NRGBA{R: 200, G: 56, B: 84, A: 255}
 
+	t.Color.LogDebugColor = color.NRGBA{R: 128, G: 128, B: 128, A: 255}
+	t.Color.LogInfoColor = color.NRGBA{R: 23, G: 165, B: 165, A: 255}
+	t.Color.LogWarnColor = color.NRGBA{R: 141, G: 118, B: 15, A: 255}
+	t.Color.LogErrorColor = color.NRGBA{R: 229, G: 81, B: 77, A: 255}
+	// 214, 6, 0
+	t.Color.LogFataCorColor = color.NRGBA{R: 214, G: 6, B: 0, A: 255}
+
 	t.Color.ErrorColor = color.NRGBA{R: 232, G: 127, B: 127, A: 255}
 	t.Color.WarningColor = color.NRGBA{R: 242, G: 201, B: 126, A: 255}
 	t.Color.SuccessColor = color.NRGBA{R: 99, G: 226, B: 184, A: 255}
@@ -412,6 +426,7 @@ func (t *Theme) dark() *Theme {
 
 	t.Size.DefaultElementWidth = unit.Dp(500)
 	t.Size.DefaultTextSize = unit.Sp(12)
+	t.Size.DefaultLogTextSize = unit.Sp(15)
 	t.Size.DropdownTextSize = unit.Sp(12)
 	t.Size.DefaultIconSize = unit.Dp(20)
 	t.Size.DefaultElementRadiusSize = unit.Dp(4)
