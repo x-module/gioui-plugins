@@ -101,41 +101,36 @@ func (j *LogViewer) formatLog(log LogData) LogData {
 
 func (j *LogViewer) Debug(log string) {
 	j.lines = append(j.lines, j.formatLog(LogData{Log: log, Type: Debug}))
-	j.selectables = make([]*widget.Selectable, len(j.lines))
-	for i := range j.selectables {
-		j.selectables[i] = &widget.Selectable{}
-	}
+	j.syncView()
 }
 
 func (j *LogViewer) Info(log string) {
 	j.lines = append(j.lines, j.formatLog(LogData{Log: log, Type: Info}))
-	j.selectables = make([]*widget.Selectable, len(j.lines))
-	for i := range j.selectables {
-		j.selectables[i] = &widget.Selectable{}
-	}
+	j.syncView()
 }
 
 func (j *LogViewer) Warn(log string) {
 	j.lines = append(j.lines, j.formatLog(LogData{Log: log, Type: Warn}))
-	j.selectables = make([]*widget.Selectable, len(j.lines))
-	for i := range j.selectables {
-		j.selectables[i] = &widget.Selectable{}
-	}
+	j.syncView()
 }
 func (j *LogViewer) Error(log string) {
 	j.lines = append(j.lines, j.formatLog(LogData{Log: log, Type: Error}))
-	j.selectables = make([]*widget.Selectable, len(j.lines))
-	for i := range j.selectables {
-		j.selectables[i] = &widget.Selectable{}
-	}
+	j.syncView()
 }
 
 func (j *LogViewer) Fatal(log string) {
 	j.lines = append(j.lines, j.formatLog(LogData{Log: log, Type: Fatal}))
+	j.syncView()
+}
+
+func (j *LogViewer) syncView() {
 	j.selectables = make([]*widget.Selectable, len(j.lines))
 	for i := range j.selectables {
 		j.selectables[i] = &widget.Selectable{}
 	}
+	// 如果有新数据，滚动到底部
+	j.list.Position.BeforeEnd = true
+	j.list.Position.Offset = j.list.Position.Length
 }
 
 func (j *LogViewer) Layout(gtx layout.Context) layout.Dimensions {
