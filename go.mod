@@ -3,7 +3,6 @@ module github.com/x-module/gioui-plugins
 go 1.22.5
 
 require (
-	eliasnaur.com/font v0.0.0-20230308162249-dd43949cb42d
 	gioui.org v0.7.1
 	gioui.org/x v0.7.1
 	github.com/alecthomas/chroma/v2 v2.14.0
